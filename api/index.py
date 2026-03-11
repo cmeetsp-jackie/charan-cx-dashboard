@@ -26,11 +26,8 @@ def stats():
 def get_real_stats(access_key, access_secret):
     """실제 채널톡 API 호출"""
     try:
-        # 오늘 00:00부터
-        today_start = int(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp() * 1000)
-        
-        # API 요청 - x-access-key/secret 방식 시도
-        url = f"https://api.channel.io/open/v5/user-chats?since={today_start}&limit=1000&sortOrder=desc"
+        # API 요청 - limit만 사용 (since 파라미터 제거)
+        url = "https://api.channel.io/open/v5/user-chats?limit=100&sortOrder=desc"
         req = urllib.request.Request(url)
         req.add_header('x-access-key', access_key)
         req.add_header('x-access-secret', access_secret)
@@ -41,14 +38,22 @@ def get_real_stats(access_key, access_secret):
         
         user_chats = result.get('userChats', [])
         
+        # 오늘 날짜 필터링
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_chats = [
+            chat for chat in user_chats 
+            if chat.get('createdAt', 0) > 0 and 
+            datetime.fromtimestamp(chat.get('createdAt') / 1000) >= today_start
+        ]
+        
         # 통계 계산
-        total_today = len(user_chats)
-        open_count = sum(1 for chat in user_chats if chat.get('state') == 'opened')
-        closed_count = sum(1 for chat in user_chats if chat.get('state') == 'closed')
+        total_today = len(today_chats)
+        open_count = sum(1 for chat in today_chats if chat.get('state') == 'opened')
+        closed_count = sum(1 for chat in today_chats if chat.get('state') == 'closed')
         
         # 시간대별
         hourly_data = [0] * 24
-        for chat in user_chats:
+        for chat in today_chats:
             created_at = chat.get('createdAt', 0)
             if created_at > 0:
                 hour = datetime.fromtimestamp(created_at / 1000).hour
@@ -56,7 +61,7 @@ def get_real_stats(access_key, access_secret):
         
         # 팀원별
         managers = {}
-        for chat in user_chats:
+        for chat in today_chats:
             assignee = chat.get('assignee')
             if assignee:
                 name = assignee.get('name', '미지정')
