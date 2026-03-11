@@ -37,6 +37,10 @@ def get_real_stats(access_key, access_secret):
             result = json.loads(response.read().decode('utf-8'))
         
         user_chats = result.get('userChats', [])
+        managers_data = result.get('managers', [])
+        
+        # 매니저 ID -> 이름 매핑
+        manager_map = {m['id']: m['name'] for m in managers_data}
         
         # 오늘 날짜 필터링
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -48,8 +52,9 @@ def get_real_stats(access_key, access_secret):
         
         # 통계 계산
         total_today = len(today_chats)
+        # opened = 진행 중, 나머지는 완료로 간주
         open_count = sum(1 for chat in today_chats if chat.get('state') == 'opened')
-        closed_count = sum(1 for chat in today_chats if chat.get('state') == 'closed')
+        closed_count = total_today - open_count
         
         # 시간대별
         hourly_data = [0] * 24
@@ -59,27 +64,40 @@ def get_real_stats(access_key, access_secret):
                 hour = datetime.fromtimestamp(created_at / 1000).hour
                 hourly_data[hour] += 1
         
-        # 팀원별
-        managers = {}
-        for chat in today_chats:
-            assignee = chat.get('assignee')
-            if assignee:
-                name = assignee.get('name', '미지정')
-                managers[name] = managers.get(name, 0) + 1
+        # 평균 응답 시간 계산 (waitingTime 사용)
+        waiting_times = [
+            chat.get('waitingTime', 0) / 1000  # 밀리초를 초로 변환
+            for chat in today_chats 
+            if chat.get('waitingTime', 0) > 0
+        ]
+        avg_response_time = int(sum(waiting_times) / len(waiting_times)) if waiting_times else 300
         
+        # 팀원별 (assigneeId 사용)
+        manager_stats = {}
+        for chat in today_chats:
+            assignee_id = chat.get('assigneeId')
+            if assignee_id and assignee_id in manager_map:
+                name = manager_map[assignee_id]
+                manager_stats[name] = manager_stats.get(name, 0) + 1
+        
+        # 팀원 성과 리스트
         team_performance = [
             {"name": name, "handled": count, "avg_time": random.randint(180, 420)}
-            for name, count in sorted(managers.items(), key=lambda x: x[1], reverse=True)[:4]
+            for name, count in sorted(manager_stats.items(), key=lambda x: x[1], reverse=True)[:4]
         ]
         
-        if not team_performance:
-            team_performance = [{"name": "매니저", "handled": total_today, "avg_time": 300}]
+        # 팀원 데이터가 없으면 전체 매니저 표시
+        if not team_performance and managers_data:
+            team_performance = [
+                {"name": m['name'], "handled": 0, "avg_time": 0}
+                for m in managers_data[:4]
+            ]
         
         return {
             "total_today": total_today,
             "open": open_count,
             "closed": closed_count,
-            "avg_response_time": 300,
+            "avg_response_time": avg_response_time,
             "hourly_data": hourly_data,
             "team_performance": team_performance,
             "csat_score": 4.5,
