@@ -204,7 +204,7 @@ def fetch_channeltalk_data(access_key, access_secret):
     
     for state in ['opened', 'closed']:
         # closed는 더 많이 조회 필요
-        max_offset = 5000 if state == 'closed' else 2000
+        max_offset = 10000 if state == 'closed' else 2000
         
         for offset in range(0, max_offset, 1000):
             url = f"https://api.channel.io/open/v5/user-chats?limit=1000&offset={offset}&state={state}&sortOrder=desc"
