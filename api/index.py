@@ -1,31 +1,27 @@
-from http.server import BaseHTTPRequestHandler
-import json
+from flask import Flask, jsonify
 import os
 import urllib.request
 import base64
+import json
 from datetime import datetime
 import random
 
+app = Flask(__name__)
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # CORS 헤더
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        
-        # 채널톡 API 키
-        access_key = os.getenv('CHANNELTALK_ACCESS_KEY')
-        access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET')
-        
-        if access_key and access_secret:
-            stats = get_real_stats(access_key, access_secret)
-        else:
-            stats = generate_demo_data()
-        
-        self.wfile.write(json.dumps(stats, ensure_ascii=False).encode('utf-8'))
-        return
+
+@app.route('/api/stats')
+def stats():
+    """채널톡 통계 API"""
+    # 채널톡 API 키
+    access_key = os.getenv('CHANNELTALK_ACCESS_KEY')
+    access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET')
+    
+    if access_key and access_secret:
+        data = get_real_stats(access_key, access_secret)
+    else:
+        data = generate_demo_data()
+    
+    return jsonify(data)
 
 
 def get_real_stats(access_key, access_secret):
@@ -45,9 +41,9 @@ def get_real_stats(access_key, access_secret):
         req.add_header('Content-Type', 'application/json')
         
         with urllib.request.urlopen(req, timeout=10) as response:
-            data = json.loads(response.read().decode('utf-8'))
+            result = json.loads(response.read().decode('utf-8'))
         
-        user_chats = data.get('userChats', [])
+        user_chats = result.get('userChats', [])
         
         # 통계 계산
         total_today = len(user_chats)
@@ -86,13 +82,13 @@ def get_real_stats(access_key, access_secret):
             "hourly_data": hourly_data,
             "team_performance": team_performance,
             "csat_score": 4.5,
-            "data_source": "채널톡 실시간 데이터 ✅"
+            "data_source": "✅ 차란 채널톡 실시간 데이터"
         }
         
     except Exception as e:
         print(f"채널톡 API 에러: {e}")
         demo = generate_demo_data()
-        demo["data_source"] = f"데모 데이터 (API 에러: {str(e)})"
+        demo["data_source"] = f"⚠️ 데모 데이터 (API 에러: {str(e)[:50]})"
         return demo
 
 
@@ -123,5 +119,5 @@ def generate_demo_data():
             {"name": "최유진", "handled": 35, "avg_time": 290}
         ],
         "csat_score": round(random.uniform(4.2, 4.8), 1),
-        "data_source": "데모 데이터 (API 키 없음)"
+        "data_source": "⚠️ 데모 데이터 (API 키 없음)"
     }
