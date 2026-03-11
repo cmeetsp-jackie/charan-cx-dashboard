@@ -210,7 +210,7 @@ def classify_chat(chat):
 
 def calculate_member_stats(chats, all_chats):
     """팀원별 통계"""
-    # 매니저 정보
+    # 매니저 정보 가져오기
     manager_map = {}
     try:
         url = "https://api.channel.io/open/v5/user-chats?limit=1"
@@ -224,21 +224,31 @@ def calculate_member_stats(chats, all_chats):
         with urllib.request.urlopen(req, timeout=10) as response:
             result = json.loads(response.read().decode('utf-8'))
             managers = result.get('managers', [])
-            manager_map = {m['id']: m['name'] for m in managers}
-    except:
-        pass
+            # ID를 문자열로 변환하여 매핑
+            manager_map = {str(m['id']): m['name'] for m in managers}
+            print(f"매니저 맵: {manager_map}")
+    except Exception as e:
+        print(f"매니저 정보 가져오기 실패: {e}")
     
     # 팀원별 카운트
     member_counts = defaultdict(int)
     for chat in chats:
         assignee_id = chat.get('assigneeId')
-        if assignee_id and assignee_id in manager_map:
-            member_counts[manager_map[assignee_id]] += 1
+        if assignee_id:
+            assignee_str = str(assignee_id)
+            if assignee_str in manager_map:
+                member_counts[manager_map[assignee_str]] += 1
+            else:
+                # assigneeId가 있지만 매핑 안 됨
+                member_counts[f'Unknown_{assignee_str}'] += 1
     
-    return [
+    result = [
         {'name': name, 'count': count}
         for name, count in sorted(member_counts.items(), key=lambda x: x[1], reverse=True)
     ]
+    
+    print(f"팀원 통계: {result}")
+    return result
 
 
 def calculate_avg_response(chats):
