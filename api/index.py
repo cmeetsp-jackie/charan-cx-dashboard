@@ -235,7 +235,17 @@ def fetch_channeltalk_data(access_key, access_secret):
     
     # 2주 내 데이터만 필터링
     filtered = [c for c in all_chats if c.get('createdAt', 0) >= cutoff_timestamp]
-    return filtered
+    
+    # ID 기준 중복 제거
+    seen = set()
+    unique_chats = []
+    for chat in filtered:
+        chat_id = chat.get('id')
+        if chat_id and chat_id not in seen:
+            seen.add(chat_id)
+            unique_chats.append(chat)
+    
+    return unique_chats
 
 
 def classify_chat(chat):
