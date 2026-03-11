@@ -337,7 +337,7 @@
         
         <div class="auto-refresh">
             <span class="pulse"></span>
-            라이브 · 마지막 업데이트: <span id="last-update">-</span>
+            <span id="data-source-indicator">로딩 중...</span> · 마지막 업데이트: <span id="last-update">-</span>
         </div>
         
         <div class="footer">
@@ -486,9 +486,12 @@
             let data;
             
             try {
-                // Vercel API 호출
-                const response = await fetch('/api/stats');
+                // Vercel API 호출 (캐시 무효화)
+                const response = await fetch('/api/stats?v=' + Date.now());
                 data = await response.json();
+                
+                // 디버깅: 데이터 소스 확인
+                console.log('API 응답:', data.data_source);
             } catch (error) {
                 console.error('API 호출 실패, 데모 데이터 사용:', error);
                 data = generateDemoData();
@@ -523,6 +526,16 @@
                     </div>
                 </div>
             `).join('');
+            
+            // 데이터 소스 표시
+            const sourceIndicator = document.getElementById('data-source-indicator');
+            if (data.data_source && data.data_source.includes('실시간')) {
+                sourceIndicator.textContent = '✅ 실시간 데이터';
+                sourceIndicator.style.color = '#27ae60';
+            } else {
+                sourceIndicator.textContent = '⚠️ 데모 데이터';
+                sourceIndicator.style.color = '#e74c3c';
+            }
             
             // 업데이트 시간
             const now = new Date();
