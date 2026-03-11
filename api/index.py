@@ -29,15 +29,32 @@ def stats():
 def get_real_stats(access_key, access_secret):
     """실제 채널톡 API 호출"""
     try:
-        # API 요청 - limit만 사용 (since 파라미터 제거)
-        url = "https://api.channel.io/open/v5/user-chats?limit=100&sortOrder=desc"
-        req = urllib.request.Request(url)
-        req.add_header('x-access-key', access_key)
-        req.add_header('x-access-secret', access_secret)
-        req.add_header('Content-Type', 'application/json')
+        # opened 상태 대화 가져오기
+        url_opened = "https://api.channel.io/open/v5/user-chats?limit=200&state=opened&sortOrder=desc"
+        req_opened = urllib.request.Request(url_opened)
+        req_opened.add_header('x-access-key', access_key)
+        req_opened.add_header('x-access-secret', access_secret)
+        req_opened.add_header('Content-Type', 'application/json')
         
-        with urllib.request.urlopen(req, timeout=10) as response:
-            result = json.loads(response.read().decode('utf-8'))
+        with urllib.request.urlopen(req_opened, timeout=10) as response:
+            result_opened = json.loads(response.read().decode('utf-8'))
+        
+        # closed 상태 대화 가져오기
+        url_closed = "https://api.channel.io/open/v5/user-chats?limit=200&state=closed&sortOrder=desc"
+        req_closed = urllib.request.Request(url_closed)
+        req_closed.add_header('x-access-key', access_key)
+        req_closed.add_header('x-access-secret', access_secret)
+        req_closed.add_header('Content-Type', 'application/json')
+        
+        with urllib.request.urlopen(req_closed, timeout=10) as response:
+            result_closed = json.loads(response.read().decode('utf-8'))
+        
+        # 두 결과 합치기
+        result = {
+            'userChats': result_opened.get('userChats', []) + result_closed.get('userChats', []),
+            'managers': result_opened.get('managers', []),
+            'users': result_opened.get('users', []) + result_closed.get('users', [])
+        }
         
         user_chats = result.get('userChats', [])
         managers_data = result.get('managers', [])
@@ -57,9 +74,12 @@ def get_real_stats(access_key, access_secret):
         
         # 통계 계산
         total_today = len(today_chats)
-        # opened = 진행 중, 나머지는 완료로 간주
         open_count = sum(1 for chat in today_chats if chat.get('state') == 'opened')
-        closed_count = total_today - open_count
+        closed_count = sum(1 for chat in today_chats if chat.get('state') == 'closed')
+        
+        # 마켓/케어드 구분 (태그 기반)
+        market_count = sum(1 for chat in today_chats if any('마켓' in tag or 'market' in tag.lower() for tag in chat.get('tags', [])))
+        cared_count = sum(1 for chat in today_chats if any('케어드' in tag or 'cared' in tag.lower() for tag in chat.get('tags', [])))
         
         # 시간대별 (한국 시간 기준)
         hourly_data = [0] * 24
@@ -102,6 +122,8 @@ def get_real_stats(access_key, access_secret):
             "total_today": total_today,
             "open": open_count,
             "closed": closed_count,
+            "market_count": market_count,
+            "cared_count": cared_count,
             "avg_response_time": avg_response_time,
             "hourly_data": hourly_data,
             "team_performance": team_performance,
@@ -130,10 +152,15 @@ def generate_demo_data():
     
     total = sum(hourly_data)
     
+    open_count = random.randint(5, 15)
+    closed_count = total - open_count
+    
     return {
         "total_today": total,
-        "open": random.randint(5, 15),
-        "closed": total - random.randint(5, 15),
+        "open": open_count,
+        "closed": closed_count,
+        "market_count": int(total * 0.6),
+        "cared_count": int(total * 0.4),
         "avg_response_time": random.randint(180, 420),
         "hourly_data": hourly_data,
         "team_performance": [

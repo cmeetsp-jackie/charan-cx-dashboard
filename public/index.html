@@ -322,6 +322,22 @@
             </div>
         </div>
         
+        <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px;">
+            <div class="kpi-card" style="border-left: 4px solid #3498db;">
+                <span class="kpi-icon">🛒</span>
+                <div class="kpi-label">마켓 문의</div>
+                <div class="kpi-value" id="market-count" style="color: #3498db;">-</div>
+                <div class="kpi-change">구매 관련</div>
+            </div>
+            
+            <div class="kpi-card" style="border-left: 4px solid #9b59b6;">
+                <span class="kpi-icon">📦</span>
+                <div class="kpi-label">케어드 문의</div>
+                <div class="kpi-value" id="cared-count" style="color: #9b59b6;">-</div>
+                <div class="kpi-change">위탁 관련</div>
+            </div>
+        </div>
+        
         <div class="charts-grid">
             <div class="chart-container">
                 <h2>시간대별 대화량</h2>
@@ -501,6 +517,8 @@
             animateValue('total-today', data.total_today);
             animateValue('open-count', data.open);
             animateValue('closed-count', data.closed);
+            animateValue('market-count', data.market_count || 0);
+            animateValue('cared-count', data.cared_count || 0);
             
             const avgMinutes = Math.round(data.avg_response_time / 60);
             document.getElementById('avg-response').textContent = `${avgMinutes}분`;
