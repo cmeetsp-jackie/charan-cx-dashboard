@@ -77,22 +77,38 @@ def get_real_stats(access_key, access_secret):
         open_count = sum(1 for chat in today_chats if chat.get('state') == 'opened')
         closed_count = sum(1 for chat in today_chats if chat.get('state') == 'closed')
         
-        # 마켓/케어드 구분 (태그 기반)
-        # 마켓: "구매자/" 태그, 케어드: "판매자/" 태그
+        # 마켓/케어드 구분 (채널톡 태그 기반)
+        # 마켓: 구매 관련, 케어드: 판매/위탁 관련
+        
+        # 마켓 키워드 (구매자 관련)
+        market_keywords = [
+            '구매자', '구매', '배송', '반품', '환불', '결제', 
+            '주문', '오배송', '취소', '쿠폰', '할인', '이벤트'
+        ]
+        
+        # 케어드 키워드 (판매자 관련)
+        cared_keywords = [
+            '판매자', '판매', '수거', '검수', '정산', '차란백', 
+            'kg판매', '위탁', '철회', '옷장정리', '회수'
+        ]
+        
         market_count = 0
         cared_count = 0
         
         for chat in today_chats:
             tags = chat.get('tags', [])
-            tag_text = ' '.join(tags).lower()
+            tag_text = ' '.join(tags)
             
-            # 구매자 관련 = 마켓 문의
-            if '구매자' in tag_text or '마켓' in tag_text:
+            # 마켓 문의 확인
+            is_market = any(keyword in tag_text for keyword in market_keywords)
+            # 케어드 문의 확인
+            is_cared = any(keyword in tag_text for keyword in cared_keywords)
+            
+            if is_market:
                 market_count += 1
-            # 판매자/위탁 관련 = 케어드 문의
-            elif '판매자' in tag_text or '위탁' in tag_text or '케어드' in tag_text or '수거' in tag_text or '정산' in tag_text:
+            elif is_cared:
                 cared_count += 1
-            # 태그가 없는 경우도 처리 (기본값 없음)
+            # 둘 다 아닌 경우 미분류
         
         # 시간대별 (한국 시간 기준)
         hourly_data = [0] * 24
