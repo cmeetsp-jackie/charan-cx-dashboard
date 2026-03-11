@@ -61,6 +61,8 @@ MARKET_TAGS = [
 def stats():
     """채널톡 통계 API"""
     period = request.args.get('period', 'daily')  # daily or weekly
+    start_date = request.args.get('startDate', '')  # YYYY-MM-DD
+    end_date = request.args.get('endDate', '')  # YYYY-MM-DD
     
     access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
     access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
@@ -68,7 +70,7 @@ def stats():
     if period == 'daily':
         data = get_daily_stats(access_key, access_secret)
     else:
-        data = get_weekly_stats(access_key, access_secret)
+        data = get_weekly_stats(access_key, access_secret, start_date, end_date)
     
     return jsonify(data)
 
@@ -122,17 +124,31 @@ def get_daily_stats(access_key, access_secret):
         return generate_demo_daily()
 
 
-def get_weekly_stats(access_key, access_secret):
-    """주간 통계 (최근 7일)"""
+def get_weekly_stats(access_key, access_secret, start_date_str='', end_date_str=''):
+    """주간 통계"""
     try:
         chats = fetch_channeltalk_data(access_key, access_secret)
         
-        now_kst = datetime.now(KST)
-        week_ago = now_kst - timedelta(days=7)
+        # 주간 날짜 파싱
+        if start_date_str and end_date_str:
+            # YYYY-MM-DD 형식
+            start_parts = start_date_str.split('-')
+            end_parts = end_date_str.split('-')
+            
+            start_date = datetime(int(start_parts[0]), int(start_parts[1]), int(start_parts[2]), 0, 0, 0, tzinfo=KST)
+            end_date = datetime(int(end_parts[0]), int(end_parts[1]), int(end_parts[2]), 23, 59, 59, tzinfo=KST)
+        else:
+            # 기본: 이번 주 (수요일~화요일)
+            now_kst = datetime.now(KST)
+            # 오늘이 수요일(2)보다 이전이면 지난주 수요일부터
+            days_since_wed = (now_kst.weekday() - 2) % 7
+            start_date = now_kst - timedelta(days=days_since_wed)
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = start_date + timedelta(days=6, hours=23, minutes=59, seconds=59)
         
         week_chats = [
             chat for chat in chats
-            if datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) >= week_ago
+            if start_date <= datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) <= end_date
         ]
         
         # 일별 집계
@@ -141,10 +157,10 @@ def get_weekly_stats(access_key, access_secret):
             date = datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST).date()
             daily_counts[date] += 1
         
-        # 최근 7일 데이터
+        # 주간 7일 데이터 (수요일~화요일)
         daily_data = []
-        for i in range(6, -1, -1):
-            date = (now_kst - timedelta(days=i)).date()
+        for i in range(7):
+            date = (start_date + timedelta(days=i)).date()
             daily_data.append({
                 'label': f'{date.month}/{date.day}',
                 'count': daily_counts[date]

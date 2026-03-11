@@ -84,6 +84,37 @@
         .tab:hover:not(.active) {
             background: #e0e0e0;
         }
+
+        .week-tabs {
+            display: none;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .week-tabs.show {
+            display: flex;
+        }
+
+        .week-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s;
+        }
+
+        .week-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .week-tab:hover:not(.active) {
+            background: #f0f0ff;
+        }
         
         .kpi-grid {
             display: grid;
@@ -244,6 +275,10 @@
                 <button class="tab active" onclick="switchTab('daily')">Daily</button>
                 <button class="tab" onclick="switchTab('weekly')">Weekly</button>
             </div>
+            <div class="week-tabs" id="weekTabs">
+                <button class="week-tab" onclick="switchWeek('2026-03-04', '2026-03-10')">3/4 ~ 3/10</button>
+                <button class="week-tab active" onclick="switchWeek('2026-03-11', '2026-03-17')">3/11 ~ 3/17</button>
+            </div>
         </div>
 
         <div class="kpi-grid">
@@ -294,6 +329,8 @@
 
     <script>
         let currentPeriod = 'daily';
+        let currentWeekStart = '2026-03-11';
+        let currentWeekEnd = '2026-03-17';
         let hourlyChart, memberChart;
 
         // 날짜 표시
@@ -315,12 +352,30 @@
             });
             event.target.classList.add('active');
 
-            // 차트 제목 변경
-            if (period === 'daily') {
-                document.getElementById('chartTitle').textContent = '시간대별 대화량';
+            // Week 탭 표시/숨김
+            const weekTabs = document.getElementById('weekTabs');
+            if (period === 'weekly') {
+                weekTabs.classList.add('show');
+                document.getElementById('chartTitle').textContent = '일별 대화량';
             } else {
-                document.getElementById('chartTitle').textContent = '일별 대화량 (최근 7일)';
+                weekTabs.classList.remove('show');
+                document.getElementById('chartTitle').textContent = '시간대별 대화량';
             }
+
+            // 데이터 갱신
+            updateDashboard();
+        }
+
+        // 주간 전환
+        function switchWeek(startDate, endDate) {
+            currentWeekStart = startDate;
+            currentWeekEnd = endDate;
+
+            // 주간 탭 활성화
+            document.querySelectorAll('.week-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
 
             // 데이터 갱신
             updateDashboard();
@@ -328,7 +383,11 @@
 
         async function updateDashboard() {
             try {
-                const response = await fetch(`/api/stats?period=${currentPeriod}`);
+                let url = `/api/stats?period=${currentPeriod}`;
+                if (currentPeriod === 'weekly') {
+                    url += `&startDate=${currentWeekStart}&endDate=${currentWeekEnd}`;
+                }
+                const response = await fetch(url);
                 const data = await response.json();
 
                 // KPI 업데이트
