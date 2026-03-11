@@ -194,7 +194,7 @@ def get_weekly_stats(access_key, access_secret, start_date_str='', end_date_str=
 
 
 def fetch_channeltalk_data(access_key, access_secret):
-    """채널톡 데이터 가져오기 (최근 2주만)"""
+    """채널톡 데이터 가져오기 (최근 2주)"""
     all_chats = []
     
     # 2주 전 타임스탬프 계산
@@ -203,8 +203,10 @@ def fetch_channeltalk_data(access_key, access_secret):
     cutoff_timestamp = int(two_weeks_ago.timestamp() * 1000)
     
     for state in ['opened', 'closed']:
-        # 최대 2000개까지만 (충분함)
-        for offset in range(0, 2000, 1000):
+        # closed는 더 많이 조회 필요
+        max_offset = 5000 if state == 'closed' else 2000
+        
+        for offset in range(0, max_offset, 1000):
             url = f"https://api.channel.io/open/v5/user-chats?limit=1000&offset={offset}&state={state}&sortOrder=desc"
             req = urllib.request.Request(url)
             req.add_header('x-access-key', access_key)
@@ -212,27 +214,28 @@ def fetch_channeltalk_data(access_key, access_secret):
             req.add_header('Content-Type', 'application/json')
             
             try:
-                with urllib.request.urlopen(req, timeout=5) as response:
+                with urllib.request.urlopen(req, timeout=8) as response:
                     result = json.loads(response.read().decode('utf-8'))
                     chats = result.get('userChats', [])
                     
                     if not chats:
                         break
                     
+                    # 모든 데이터 추가 (나중에 필터링)
+                    all_chats.extend(chats)
+                    
                     # 2주 이전 데이터면 중단
                     oldest = chats[-1].get('createdAt', 0)
                     if oldest < cutoff_timestamp:
-                        # 2주 내 데이터만 추가
-                        recent_chats = [c for c in chats if c.get('createdAt', 0) >= cutoff_timestamp]
-                        all_chats.extend(recent_chats)
                         break
                     
-                    all_chats.extend(chats)
             except Exception as e:
                 print(f"API 호출 실패 (state={state}, offset={offset}): {e}")
                 break
     
-    return all_chats
+    # 2주 내 데이터만 필터링
+    filtered = [c for c in all_chats if c.get('createdAt', 0) >= cutoff_timestamp]
+    return filtered
 
 
 def classify_chat(chat):
