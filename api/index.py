@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 import os
 import urllib.request
-import base64
 import json
 from datetime import datetime
 import random
@@ -27,17 +26,14 @@ def stats():
 def get_real_stats(access_key, access_secret):
     """실제 채널톡 API 호출"""
     try:
-        # Basic Auth
-        credentials = f"{access_key}:{access_secret}"
-        encoded = base64.b64encode(credentials.encode()).decode()
-        
         # 오늘 00:00부터
         today_start = int(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp() * 1000)
         
-        # API 요청
+        # API 요청 - x-access-key/secret 방식 시도
         url = f"https://api.channel.io/open/v5/user-chats?since={today_start}&limit=1000&sortOrder=desc"
         req = urllib.request.Request(url)
-        req.add_header('Authorization', f'Basic {encoded}')
+        req.add_header('x-access-key', access_key)
+        req.add_header('x-access-secret', access_secret)
         req.add_header('Content-Type', 'application/json')
         
         with urllib.request.urlopen(req, timeout=10) as response:
