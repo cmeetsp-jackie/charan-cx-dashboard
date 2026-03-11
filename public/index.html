@@ -58,63 +58,6 @@
             color: #7f8c8d;
             font-size: 15px;
         }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .tab {
-            padding: 10px 24px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .tab:hover:not(.active) {
-            background: #e0e0e0;
-        }
-
-        .week-tabs {
-            display: none;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .week-tabs.show {
-            display: flex;
-        }
-
-        .week-tab {
-            padding: 8px 16px;
-            background: white;
-            border: 2px solid #667eea;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #667eea;
-            transition: all 0.3s;
-        }
-
-        .week-tab.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .week-tab:hover:not(.active) {
-            background: #f0f0ff;
-        }
         
         .kpi-grid {
             display: grid;
@@ -302,15 +245,7 @@
     <div class="container">
         <div class="header">
             <h1>📊 차란 CX 실시간 대시보드 <span id="currentDate" style="font-size: 20px; color: #7f8c8d;"></span></h1>
-            <div class="subtitle">채널톡 고객응대 현황</div>
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('daily')">Daily</button>
-                <button class="tab" onclick="switchTab('weekly')">Weekly</button>
-            </div>
-            <div class="week-tabs" id="weekTabs">
-                <button class="week-tab" onclick="switchWeek('2026-03-04', '2026-03-10')">3/4 ~ 3/10</button>
-                <button class="week-tab active" onclick="switchWeek('2026-03-11', '2026-03-17')">3/11 ~ 3/17</button>
-            </div>
+            <div class="subtitle">채널톡 고객응대 현황 - Daily</div>
         </div>
 
         <div class="kpi-grid">
@@ -346,7 +281,7 @@
 
         <div class="chart-section">
             <div class="chart-card">
-                <div class="chart-title" id="chartTitle">시간대별 대화량</div>
+                <div class="chart-title">시간대별 대화량</div>
                 <canvas id="hourlyChart"></canvas>
             </div>
             <div class="chart-card">
@@ -365,9 +300,6 @@
     </div>
 
     <script>
-        let currentPeriod = 'daily';
-        let currentWeekStart = '2026-03-11';
-        let currentWeekEnd = '2026-03-17';
         let hourlyChart, memberChart;
 
         // 날짜 표시
@@ -379,55 +311,11 @@
             document.getElementById('currentDate').textContent = `(${year}.${month}.${day})`;
         }
 
-        // 탭 전환
-        function switchTab(period) {
-            currentPeriod = period;
-            
-            // 탭 활성화
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Week 탭 표시/숨김
-            const weekTabs = document.getElementById('weekTabs');
-            if (period === 'weekly') {
-                weekTabs.classList.add('show');
-                document.getElementById('chartTitle').textContent = '일별 대화량';
-            } else {
-                weekTabs.classList.remove('show');
-                document.getElementById('chartTitle').textContent = '시간대별 대화량';
-            }
-
-            // 데이터 갱신
-            updateDashboard();
-        }
-
-        // 주간 전환
-        function switchWeek(startDate, endDate) {
-            currentWeekStart = startDate;
-            currentWeekEnd = endDate;
-
-            // 주간 탭 활성화
-            document.querySelectorAll('.week-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // 데이터 갱신
-            updateDashboard();
-        }
-
         async function updateDashboard() {
-            // 로딩 표시
             document.getElementById('loading').classList.add('show');
             
             try {
-                let url = `/api/stats?period=${currentPeriod}`;
-                if (currentPeriod === 'weekly') {
-                    url += `&startDate=${currentWeekStart}&endDate=${currentWeekEnd}`;
-                }
-                const response = await fetch(url, { timeout: 15000 });
+                const response = await fetch('/api/stats?period=daily', { timeout: 15000 });
                 
                 if (!response.ok) {
                     throw new Error('API 응답 실패');
@@ -444,8 +332,8 @@
                 document.getElementById('avgResponse').textContent = data.avg_response_time || '-';
                 document.getElementById('csat').textContent = data.csat ? `${data.csat}/5.0` : '-';
 
-                // 시간대별/일별 차트 업데이트
-                updateHourlyChart(data.hourly_data || data.daily_data);
+                // 시간대별 차트 업데이트
+                updateHourlyChart(data.hourly_data);
 
                 // 팀원별 차트 업데이트
                 updateMemberChart(data.member_stats);
@@ -458,7 +346,6 @@
                 console.error('데이터 로드 실패:', error);
                 alert('데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
             } finally {
-                // 로딩 숨김
                 document.getElementById('loading').classList.remove('show');
             }
         }
@@ -470,16 +357,12 @@
                 hourlyChart.destroy();
             }
 
-            const labels = currentPeriod === 'daily' 
-                ? Array.from({length: 24}, (_, i) => `${i}시`)
-                : data.map(d => d.label);
+            const labels = Array.from({length: 24}, (_, i) => `${i}시`);
             
-            const values = currentPeriod === 'daily'
-                ? Array.from({length: 24}, (_, i) => {
-                    const found = data.find(d => d.hour === i);
-                    return found ? found.count : 0;
-                })
-                : data.map(d => d.count);
+            const values = Array.from({length: 24}, (_, i) => {
+                const found = data.find(d => d.hour === i);
+                return found ? found.count : 0;
+            });
 
             hourlyChart = new Chart(ctx, {
                 type: 'bar',
