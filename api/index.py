@@ -226,14 +226,14 @@ def classify_chat(chat):
 
 def calculate_member_stats(chats, all_chats):
     """팀원별 통계"""
-    # 매니저 ID 매핑 (하드코딩)
+    # 매니저 ID 매핑
     manager_map = {
-        '570790': 'Joy',
+        '435419': 'Joy',
         '524187': 'Sara',
-        '435419': 'Sia',
-        570790: 'Joy',
+        '570790': 'Sia',
+        435419: 'Joy',
         524187: 'Sara',
-        435419: 'Sia'
+        570790: 'Sia'
     }
     
     # 팀원별 카운트
