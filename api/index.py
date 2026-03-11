@@ -210,44 +210,31 @@ def classify_chat(chat):
 
 def calculate_member_stats(chats, all_chats):
     """팀원별 통계"""
-    # 매니저 정보 가져오기
-    manager_map = {}
-    try:
-        url = "https://api.channel.io/open/v5/user-chats?limit=1"
-        access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
-        access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
-        
-        req = urllib.request.Request(url)
-        req.add_header('x-access-key', access_key)
-        req.add_header('x-access-secret', access_secret)
-        
-        with urllib.request.urlopen(req, timeout=10) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            managers = result.get('managers', [])
-            # ID를 문자열로 변환하여 매핑
-            manager_map = {str(m['id']): m['name'] for m in managers}
-            print(f"매니저 맵: {manager_map}")
-    except Exception as e:
-        print(f"매니저 정보 가져오기 실패: {e}")
+    # 매니저 ID 매핑 (하드코딩)
+    manager_map = {
+        '570790': 'Joy',
+        '524187': 'Sara',
+        '435419': 'Sia',
+        570790: 'Joy',
+        524187: 'Sara',
+        435419: 'Sia'
+    }
     
     # 팀원별 카운트
     member_counts = defaultdict(int)
     for chat in chats:
         assignee_id = chat.get('assigneeId')
         if assignee_id:
-            assignee_str = str(assignee_id)
-            if assignee_str in manager_map:
-                member_counts[manager_map[assignee_str]] += 1
-            else:
-                # assigneeId가 있지만 매핑 안 됨
-                member_counts[f'Unknown_{assignee_str}'] += 1
+            # 숫자와 문자열 둘 다 체크
+            name = manager_map.get(assignee_id) or manager_map.get(str(assignee_id))
+            if name:
+                member_counts[name] += 1
     
     result = [
         {'name': name, 'count': count}
         for name, count in sorted(member_counts.items(), key=lambda x: x[1], reverse=True)
     ]
     
-    print(f"팀원 통계: {result}")
     return result
 
 
