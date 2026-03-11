@@ -20,12 +20,13 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
         
-        # 채널톡 API 토큰 확인
-        channeltalk_token = os.environ.get('CHANNELTALK_TOKEN')
+        # 채널톡 API 키 확인
+        access_key = os.environ.get('CHANNELTALK_ACCESS_KEY')
+        access_secret = os.environ.get('CHANNELTALK_ACCESS_SECRET')
         
-        if channeltalk_token:
+        if access_key and access_secret:
             # 실제 채널톡 API 호출
-            stats = self.get_real_stats(channeltalk_token)
+            stats = self.get_real_stats(access_key, access_secret)
         else:
             # 데모 데이터
             stats = self.generate_demo_data()
@@ -41,11 +42,17 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
     
-    def get_real_stats(self, access_token):
+    def get_real_stats(self, access_key, access_secret):
         """실제 채널톡 API 호출"""
         base_url = "https://api.channel.io/open/v5"
+        
+        # Basic Auth 방식
+        import base64
+        credentials = f"{access_key}:{access_secret}"
+        encoded = base64.b64encode(credentials.encode()).decode()
+        
         headers = {
-            "x-access-token": access_token,
+            "Authorization": f"Basic {encoded}",
             "Content-Type": "application/json"
         }
         
