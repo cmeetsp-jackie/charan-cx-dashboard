@@ -198,7 +198,7 @@ def fetch_channeltalk_data(access_key, access_secret):
     all_chats = []
     
     for state in ['opened', 'closed']:
-        url = f"https://api.channel.io/open/v5/user-chats?limit=200&state={state}&sortOrder=desc"
+        url = f"https://api.channel.io/open/v5/user-chats?limit=1000&state={state}&sortOrder=desc"
         req = urllib.request.Request(url)
         req.add_header('x-access-key', access_key)
         req.add_header('x-access-secret', access_secret)
