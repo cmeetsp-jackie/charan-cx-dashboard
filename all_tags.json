@@ -1,0 +1,501 @@
+[
+  {
+    "id": "2370046",
+    "channelId": "124353",
+    "colorVariant": "olive",
+    "name": "CJ분실보상",
+    "key": "cj분실보상",
+    "createdAt": 1773025037079
+  },
+  {
+    "id": "2147359",
+    "channelId": "124353",
+    "colorVariant": "pink",
+    "name": "out/P2P확인요청",
+    "key": "out/p2p확인요청",
+    "createdAt": 1760603876544
+  },
+  {
+    "id": "1895429",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "결제수단",
+    "key": "결제수단",
+    "createdAt": 1745137730365
+  },
+  {
+    "id": "2277308",
+    "channelId": "124353",
+    "colorVariant": "olive",
+    "name": "공통/구매옵션문의",
+    "key": "공통/구매옵션문의",
+    "description": "판매자 배송, 차란케어 등 구매 옵션의 종류와 차이를 묻는 문의",
+    "createdAt": 1768295583371
+  },
+  {
+    "id": "2277317",
+    "channelId": "124353",
+    "colorVariant": "pink",
+    "name": "구매자/반품가능문의(구매확정)",
+    "key": "구매자/반품가능문의(구매확정)",
+    "description": "구매 확정 이후에도 반품이 가능한지 여부와 가능 조건을 묻는 문의",
+    "createdAt": 1768295815891
+  },
+  {
+    "id": "1895433",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "기타문의_반품",
+    "key": "기타문의_반품",
+    "createdAt": 1745137855698
+  },
+  {
+    "id": "1895491",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "기타문의_판매가능상품",
+    "key": "기타문의_판매가능상품",
+    "createdAt": 1745141325103
+  },
+  {
+    "id": "1895494",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "누락상품확인_상품화",
+    "key": "누락상품확인_상품화",
+    "createdAt": 1745141341236
+  },
+  {
+    "id": "1895442",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "반품절차",
+    "key": "반품절차",
+    "createdAt": 1745137939119
+  },
+  {
+    "id": "1895443",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "반품취소",
+    "key": "반품취소",
+    "createdAt": 1745138040122
+  },
+  {
+    "id": "1895499",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거개수변경",
+    "key": "수거개수변경",
+    "createdAt": 1745141371142
+  },
+  {
+    "id": "1895500",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거방법",
+    "key": "수거방법",
+    "createdAt": 1745141376789
+  },
+  {
+    "id": "1895502",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거일변경",
+    "key": "수거일변경",
+    "createdAt": 1745141387578
+  },
+  {
+    "id": "1895503",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거지변경",
+    "key": "수거지변경",
+    "createdAt": 1745141392158
+  },
+  {
+    "id": "1895506",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거확인",
+    "key": "수거확인",
+    "createdAt": 1745141403621
+  },
+  {
+    "id": "1895509",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "신청방법_판매활성",
+    "key": "신청방법_판매활성",
+    "createdAt": 1745141422406
+  },
+  {
+    "id": "2353432",
+    "channelId": "124353",
+    "name": "옵스확인요청(슬랙티켓)",
+    "key": "옵스확인요청(슬랙티켓)",
+    "description": "옵스팀에 확인이 필요한 건을 자동 티켓 생성 방식으로 요청할 때 사용하는 태그입니다.\n태그 부착 시 내부대화에 작성된 포맷 내용을 기반으로 슬랙 티켓이 생성됩니다.",
+    "createdAt": 1772175239634
+  },
+  {
+    "id": "1895519",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "준비절차",
+    "key": "준비절차",
+    "createdAt": 1745141488874
+  },
+  {
+    "id": "1895522",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "차란백분실",
+    "key": "차란백분실",
+    "createdAt": 1745141504753
+  },
+  {
+    "id": "1895525",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "차란백취소",
+    "key": "차란백취소",
+    "createdAt": 1745141522910
+  },
+  {
+    "id": "1295785",
+    "channelId": "124353",
+    "colorVariant": "yellow",
+    "name": "추가안내필요",
+    "key": "추가안내필요",
+    "createdAt": 1702972040010
+  },
+  {
+    "id": "1895531",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매불가사유",
+    "key": "판매불가사유",
+    "createdAt": 1745141557254
+  },
+  {
+    "id": "2277355",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/검수일정문의",
+    "key": "판매자/검수일정문의",
+    "description": "검수 또는 케어 완료까지 소요되는 기간을 묻는 문의",
+    "createdAt": 1768296317534
+  },
+  {
+    "id": "2277352",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/반품절차확인문의",
+    "key": "판매자/반품절차확인문의",
+    "description": "반품 발생 시 처리 절차와 판매자 역할을 묻는 문의",
+    "createdAt": 1768296273763
+  },
+  {
+    "id": "2277334",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/상품등록·수정방법문의",
+    "key": "판매자/상품등록·수정방법문의",
+    "description": "상품 등록, 정보 수정, 가격 변경, 삭제 등 관리 방법에 대한 문의",
+    "createdAt": 1768296192039
+  },
+  {
+    "id": "2277362",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/재수거요청",
+    "key": "판매자/재수거요청",
+    "description": "미수거 또는 오수거 이후 다시 수거를 요청하는 문의",
+    "createdAt": 1768296417840
+  },
+  {
+    "id": "2277357",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/재판매가능여부문의",
+    "key": "판매자/재판매가능여부문의",
+    "description": "반품·하자 발생 이후 상품을 다시 판매할 수 있는지에 대한 문의",
+    "createdAt": 1768296345393
+  },
+  {
+    "id": "1895534",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매정보수정_전시시작",
+    "key": "판매정보수정_전시시작",
+    "createdAt": 1745141583755
+  },
+  {
+    "id": "1895536",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매철회_전시시작",
+    "key": "판매철회_전시시작",
+    "createdAt": 1745141593262
+  },
+  {
+    "id": "1895466",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "환불일정",
+    "key": "환불일정",
+    "createdAt": 1745138407457
+  },
+  {
+    "id": "1895539",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "회수배송비_전시종료",
+    "key": "회수배송비_전시종료",
+    "createdAt": 1745141609980
+  },
+  {
+    "id": "1895478",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "kg판매",
+    "key": "kg판매",
+    "createdAt": 1745141241492
+  },
+  {
+    "id": "1895514",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "검수일정",
+    "key": "검수일정",
+    "createdAt": 1745141447444
+  },
+  {
+    "id": "1895429",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "결제수단",
+    "key": "결제수단",
+    "createdAt": 1745137730365
+  },
+  {
+    "id": "2277319",
+    "channelId": "124353",
+    "colorVariant": "pink",
+    "name": "구매자/배송일정문의",
+    "key": "구매자/배송일정문의",
+    "description": "출고, 검수, 배송 시작, 도착 등 배송 프로세스의 예상 일정과 지연 사유를 묻는 문의",
+    "createdAt": 1768295848025
+  },
+  {
+    "id": "2277315",
+    "channelId": "124353",
+    "colorVariant": "pink",
+    "name": "구매자/쿠폰적용문의",
+    "key": "구매자/쿠폰적용문의",
+    "description": "특정 쿠폰이 마켓 상품에 적용 가능한지, 적용 범위와 조건을 묻는 문의",
+    "createdAt": 1768295779641
+  },
+  {
+    "id": "1895431",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "구매확정",
+    "key": "구매확정",
+    "createdAt": 1745137751854
+  },
+  {
+    "id": "1895487",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "기존백수거",
+    "key": "기존백수거",
+    "createdAt": 1745141299457
+  },
+  {
+    "id": "1895490",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "기타문의_판매정산",
+    "key": "기타문의_판매정산",
+    "createdAt": 1745141317768
+  },
+  {
+    "id": "1895985",
+    "channelId": "124353",
+    "name": "문의아님",
+    "key": "문의아님",
+    "createdAt": 1745198350373
+  },
+  {
+    "id": "1895441",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "반품수거일정",
+    "key": "반품수거일정",
+    "createdAt": 1745137931464
+  },
+  {
+    "id": "1895443",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "반품취소",
+    "key": "반품취소",
+    "createdAt": 1745138040122
+  },
+  {
+    "id": "1895445",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "배송일정",
+    "key": "배송일정",
+    "createdAt": 1745138068411
+  },
+  {
+    "id": "1895499",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거개수변경",
+    "key": "수거개수변경",
+    "createdAt": 1745141371142
+  },
+  {
+    "id": "1895501",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "수거시간_옷장정리수거",
+    "key": "수거시간_옷장정리수거",
+    "createdAt": 1745141382108
+  },
+  {
+    "id": "1895510",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "연장",
+    "key": "연장",
+    "createdAt": 1745141427665
+  },
+  {
+    "id": "1895451",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "오배송",
+    "key": "오배송",
+    "createdAt": 1745138113474
+  },
+  {
+    "id": "2353432",
+    "channelId": "124353",
+    "name": "옵스확인요청(슬랙티켓)",
+    "key": "옵스확인요청(슬랙티켓)",
+    "description": "옵스팀에 확인이 필요한 건을 자동 티켓 생성 방식으로 요청할 때 사용하는 태그입니다.\n태그 부착 시 내부대화에 작성된 포맷 내용을 기반으로 슬랙 티켓이 생성됩니다.",
+    "createdAt": 1772175239634
+  },
+  {
+    "id": "1895517",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "종료절차",
+    "key": "종료절차",
+    "createdAt": 1745141473597
+  },
+  {
+    "id": "1895520",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "차란백배송일정",
+    "key": "차란백배송일정",
+    "createdAt": 1745141493557
+  },
+  {
+    "id": "1895522",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "차란백분실",
+    "key": "차란백분실",
+    "createdAt": 1745141504753
+  },
+  {
+    "id": "1895523",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "차란백종류",
+    "key": "차란백종류",
+    "createdAt": 1745141510775
+  },
+  {
+    "id": "1895528",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매가능상품",
+    "key": "판매가능상품",
+    "createdAt": 1745141540708
+  },
+  {
+    "id": "1895530",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매내역",
+    "key": "판매내역",
+    "createdAt": 1745141551779
+  },
+  {
+    "id": "1895531",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매불가사유",
+    "key": "판매불가사유",
+    "createdAt": 1745141557254
+  },
+  {
+    "id": "2277357",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/재판매가능여부문의",
+    "key": "판매자/재판매가능여부문의",
+    "description": "반품·하자 발생 이후 상품을 다시 판매할 수 있는지에 대한 문의",
+    "createdAt": 1768296345393
+  },
+  {
+    "id": "2277351",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/정산관련문의",
+    "key": "판매자/정산관련문의",
+    "description": "판매 완료 후 정산 시점, 크레딧 지급 여부에 대한 문의",
+    "createdAt": 1768296258316
+  },
+  {
+    "id": "2277330",
+    "channelId": "124353",
+    "colorVariant": "orange",
+    "name": "판매자/판매취소문의",
+    "key": "판매자/판매취소문의",
+    "description": "판매자가 특정 상품의 판매 취소를 요청하는 단순 문의",
+    "createdAt": 1768296094207
+  },
+  {
+    "id": "1895537",
+    "channelId": "124353",
+    "colorVariant": "cobalt",
+    "name": "판매철회_상품화",
+    "key": "판매철회_상품화",
+    "createdAt": 1745141598960
+  },
+  {
+    "id": "1895463",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "합반품",
+    "key": "합반품",
+    "createdAt": 1745138358207
+  },
+  {
+    "id": "1895466",
+    "channelId": "124353",
+    "colorVariant": "red",
+    "name": "환불일정",
+    "key": "환불일정",
+    "createdAt": 1745138407457
+  }
+]

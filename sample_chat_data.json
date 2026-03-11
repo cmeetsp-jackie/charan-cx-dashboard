@@ -1,0 +1,33 @@
+{
+  "chatKey": "userChat-69b11f605c5b27a31287",
+  "id": "69b12027589203610542",
+  "mainKey": "userChat-69b11f605c5b27a31287",
+  "frontKey": "userChat-69b11f605c5b27a31287",
+  "channelId": "124353",
+  "chatType": "userChat",
+  "chatId": "69b11f605c5b27a31287",
+  "personType": "user",
+  "personId": "6983c48a6a0ac37eb929",
+  "requestId": "3793987741194597000",
+  "language": "ko",
+  "createdAt": 1773215783362,
+  "version": 1,
+  "blocks": [
+    {
+      "type": "text",
+      "value": "이정원 010-8589-6673 \n주문번호 767115 (상품색상불일치)"
+    }
+  ],
+  "plainText": "이정원 010-8589-6673 \n주문번호 767115 (상품색상불일치)",
+  "updatedAt": 1773215783367,
+  "writingType": "standard",
+  "workflowButton": false,
+  "threadMsg": false,
+  "meetMsg": false,
+  "meetRoot": false,
+  "alfThreadMsg": false,
+  "threadRoot": false,
+  "alfThreadRoot": false,
+  "broadcastedMsg": false,
+  "removedByWriter": false
+}

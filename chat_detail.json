@@ -1,0 +1,51 @@
+{
+  "id": "69b12082231510c986f2",
+  "channelId": "124353",
+  "contactMediumType": "appKakao",
+  "state": "opened",
+  "managed": true,
+  "priority": "medium",
+  "userId": "69b12082134bac299887",
+  "name": "레몬 911",
+  "source": {
+    "appMessenger": {
+      "id": "30093",
+      "mediumType": "appKakao",
+      "displayName": "@차란"
+    },
+    "medium": {
+      "mediumType": "app",
+      "mediumId": "68258ec55e6a5c0b02a8",
+      "primitive": false
+    }
+  },
+  "managerIds": [
+    "524187",
+    "570790"
+  ],
+  "assigneeId": "524187",
+  "goalState": "none",
+  "firstOpenedAt": 1773215874283,
+  "openedAt": 1773215874283,
+  "createdAt": 1773215874143,
+  "updatedAt": 1773215934310,
+  "frontMessageId": "69b120be45f3b0660c00",
+  "frontUpdatedAt": 1773215934286,
+  "deskMessageId": "69b120be45f3b0660c00",
+  "deskUpdatedAt": 1773215934286,
+  "userLastMessageId": "69b120be45f3b0660c00",
+  "firstAssigneeIdAfterOpen": "570790",
+  "firstRepliedAt": 1773215885903,
+  "firstRepliedAtAfterOpen": 1773215885903,
+  "oneStop": false,
+  "waitingTime": 11620,
+  "avgReplyTime": 11620,
+  "totalReplyTime": 11620,
+  "replyCount": 1,
+  "operationWaitingTime": 11620,
+  "operationAvgReplyTime": 11620,
+  "operationTotalReplyTime": 11620,
+  "operationReplyCount": 1,
+  "firstAskedAt": 1773215874283,
+  "version": 9
+}
