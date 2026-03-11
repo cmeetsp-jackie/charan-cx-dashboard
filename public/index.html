@@ -482,8 +482,17 @@
         });
         
         // 데이터 업데이트 함수
-        function updateDashboard() {
-            const data = generateDemoData();
+        async function updateDashboard() {
+            let data;
+            
+            try {
+                // Vercel API 호출
+                const response = await fetch('/api/stats');
+                data = await response.json();
+            } catch (error) {
+                console.error('API 호출 실패, 데모 데이터 사용:', error);
+                data = generateDemoData();
+            }
             
             // KPI 업데이트
             animateValue('total-today', data.total_today);
