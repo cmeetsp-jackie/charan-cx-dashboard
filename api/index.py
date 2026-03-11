@@ -78,8 +78,21 @@ def get_real_stats(access_key, access_secret):
         closed_count = sum(1 for chat in today_chats if chat.get('state') == 'closed')
         
         # 마켓/케어드 구분 (태그 기반)
-        market_count = sum(1 for chat in today_chats if any('마켓' in tag or 'market' in tag.lower() for tag in chat.get('tags', [])))
-        cared_count = sum(1 for chat in today_chats if any('케어드' in tag or 'cared' in tag.lower() for tag in chat.get('tags', [])))
+        # 마켓: "구매자/" 태그, 케어드: "판매자/" 태그
+        market_count = 0
+        cared_count = 0
+        
+        for chat in today_chats:
+            tags = chat.get('tags', [])
+            tag_text = ' '.join(tags).lower()
+            
+            # 구매자 관련 = 마켓 문의
+            if '구매자' in tag_text or '마켓' in tag_text:
+                market_count += 1
+            # 판매자/위탁 관련 = 케어드 문의
+            elif '판매자' in tag_text or '위탁' in tag_text or '케어드' in tag_text or '수거' in tag_text or '정산' in tag_text:
+                cared_count += 1
+            # 태그가 없는 경우도 처리 (기본값 없음)
         
         # 시간대별 (한국 시간 기준)
         hourly_data = [0] * 24
