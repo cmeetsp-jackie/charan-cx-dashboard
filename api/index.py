@@ -194,19 +194,26 @@ def get_weekly_stats(access_key, access_secret, start_date_str='', end_date_str=
 
 
 def fetch_channeltalk_data(access_key, access_secret):
-    """채널톡 데이터 가져오기"""
+    """채널톡 데이터 가져오기 (페이징)"""
     all_chats = []
     
     for state in ['opened', 'closed']:
-        url = f"https://api.channel.io/open/v5/user-chats?limit=1000&state={state}&sortOrder=desc"
-        req = urllib.request.Request(url)
-        req.add_header('x-access-key', access_key)
-        req.add_header('x-access-secret', access_secret)
-        req.add_header('Content-Type', 'application/json')
-        
-        with urllib.request.urlopen(req, timeout=10) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            all_chats.extend(result.get('userChats', []))
+        # 최대 5000개까지 페이징
+        for offset in range(0, 5000, 1000):
+            url = f"https://api.channel.io/open/v5/user-chats?limit=1000&offset={offset}&state={state}&sortOrder=desc"
+            req = urllib.request.Request(url)
+            req.add_header('x-access-key', access_key)
+            req.add_header('x-access-secret', access_secret)
+            req.add_header('Content-Type', 'application/json')
+            
+            with urllib.request.urlopen(req, timeout=10) as response:
+                result = json.loads(response.read().decode('utf-8'))
+                chats = result.get('userChats', [])
+                
+                if not chats:  # 더 이상 데이터 없음
+                    break
+                    
+                all_chats.extend(chats)
     
     return all_chats
 
