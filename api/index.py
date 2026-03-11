@@ -2,8 +2,11 @@ from flask import Flask, jsonify
 import os
 import urllib.request
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import random
+
+# 한국 시간대 (KST = UTC+9)
+KST = timezone(timedelta(hours=9))
 
 app = Flask(__name__)
 
@@ -42,12 +45,14 @@ def get_real_stats(access_key, access_secret):
         # 매니저 ID -> 이름 매핑
         manager_map = {m['id']: m['name'] for m in managers_data}
         
-        # 오늘 날짜 필터링
-        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        # 오늘 날짜 필터링 (한국 시간 기준)
+        now_kst = datetime.now(KST)
+        today_start_kst = now_kst.replace(hour=0, minute=0, second=0, microsecond=0)
+        
         today_chats = [
             chat for chat in user_chats 
             if chat.get('createdAt', 0) > 0 and 
-            datetime.fromtimestamp(chat.get('createdAt') / 1000) >= today_start
+            datetime.fromtimestamp(chat.get('createdAt') / 1000, tz=KST) >= today_start_kst
         ]
         
         # 통계 계산
@@ -56,12 +61,12 @@ def get_real_stats(access_key, access_secret):
         open_count = sum(1 for chat in today_chats if chat.get('state') == 'opened')
         closed_count = total_today - open_count
         
-        # 시간대별
+        # 시간대별 (한국 시간 기준)
         hourly_data = [0] * 24
         for chat in today_chats:
             created_at = chat.get('createdAt', 0)
             if created_at > 0:
-                hour = datetime.fromtimestamp(created_at / 1000).hour
+                hour = datetime.fromtimestamp(created_at / 1000, tz=KST).hour
                 hourly_data[hour] += 1
         
         # 평균 응답 시간 계산 (waitingTime 사용)
@@ -113,7 +118,7 @@ def get_real_stats(access_key, access_secret):
 
 def generate_demo_data():
     """데모 데이터"""
-    current_hour = datetime.now().hour
+    current_hour = datetime.now(KST).hour
     hourly_pattern = [2, 1, 0, 0, 1, 2, 5, 8, 12, 18, 22, 25, 28, 30, 26, 24, 20, 18, 15, 12, 8, 6, 4, 3]
     
     hourly_data = []
