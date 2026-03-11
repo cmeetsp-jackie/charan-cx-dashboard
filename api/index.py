@@ -11,9 +11,9 @@ app = Flask(__name__)
 @app.route('/api/stats')
 def stats():
     """채널톡 통계 API"""
-    # 채널톡 API 키
-    access_key = os.getenv('CHANNELTALK_ACCESS_KEY')
-    access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET')
+    # 채널톡 API 키 (공백/개행 제거)
+    access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
+    access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
     
     if access_key and access_secret:
         data = get_real_stats(access_key, access_secret)
