@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>차란 CX 대시보드</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 15px;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .kpi-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: backwards;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .kpi-card:nth-child(1) { animation-delay: 0.1s; }
+        .kpi-card:nth-child(2) { animation-delay: 0.2s; }
+        .kpi-card:nth-child(3) { animation-delay: 0.3s; }
+        .kpi-card:nth-child(4) { animation-delay: 0.4s; }
+        .kpi-card:nth-child(5) { animation-delay: 0.5s; }
+        
+        .kpi-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .kpi-label {
+            font-size: 14px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .kpi-value {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+        
+        .kpi-card.total .kpi-value { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .kpi-card.open .kpi-value { color: #f39c12; }
+        .kpi-card.closed .kpi-value { color: #27ae60; }
+        .kpi-card.response .kpi-value { color: #e74c3c; }
+        .kpi-card.csat .kpi-value { color: #3498db; }
+        
+        .kpi-change {
+            font-size: 13px;
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .kpi-change.negative {
+            color: #e74c3c;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: backwards;
+        }
+        
+        .chart-container h2 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-container h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        
+        .auto-refresh {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+        
+        .team-list {
+            margin-top: 20px;
+        }
+        
+        .team-member {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .team-member:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .team-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+        
+        .team-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        
+        .team-stat-item strong {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .kpi-grid, .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 차란 CX 실시간 대시보드</h1>
+            <div class="subtitle">고객 응대 현황 모니터링 · 자동 새로고침 30초</div>
+        </div>
+        
+        <div class="kpi-grid">
+            <div class="kpi-card total">
+                <span class="kpi-icon">💬</span>
+                <div class="kpi-label">오늘 총 대화</div>
+                <div class="kpi-value" id="total-today">-</div>
+                <div class="kpi-change">+12% vs 어제</div>
+            </div>
+            
+            <div class="kpi-card open">
+                <span class="kpi-icon">🟡</span>
+                <div class="kpi-label">진행 중</div>
+                <div class="kpi-value" id="open-count">-</div>
+                <div class="kpi-change">실시간</div>
+            </div>
+            
+            <div class="kpi-card closed">
+                <span class="kpi-icon">✅</span>
+                <div class="kpi-label">완료</div>
+                <div class="kpi-value" id="closed-count">-</div>
+                <div class="kpi-change">+8% vs 어제</div>
+            </div>
+            
+            <div class="kpi-card response">
+                <span class="kpi-icon">⚡</span>
+                <div class="kpi-label">평균 응답 시간</div>
+                <div class="kpi-value" id="avg-response">-</div>
+                <div class="kpi-change negative">목표: 3분 이내</div>
+            </div>
+            
+            <div class="kpi-card csat">
+                <span class="kpi-icon">⭐</span>
+                <div class="kpi-label">고객 만족도 (CSAT)</div>
+                <div class="kpi-value" id="csat-score">-</div>
+                <div class="kpi-change">+0.2 vs 지난주</div>
+            </div>
+        </div>
+        
+        <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px;">
+            <div class="kpi-card" style="border-left: 4px solid #3498db;">
+                <span class="kpi-icon">🛒</span>
+                <div class="kpi-label">마켓 문의</div>
+                <div class="kpi-value" id="market-count" style="color: #3498db;">-</div>
+                <div class="kpi-change">구매 관련</div>
+            </div>
+            
+            <div class="kpi-card" style="border-left: 4px solid #9b59b6;">
+                <span class="kpi-icon">📦</span>
+                <div class="kpi-label">케어드 문의</div>
+                <div class="kpi-value" id="cared-count" style="color: #9b59b6;">-</div>
+                <div class="kpi-change">위탁 관련</div>
+            </div>
+        </div>
+        
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h2>시간대별 대화량</h2>
+                <canvas id="hourlyChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h2>팀원별 처리 현황</h2>
+                <canvas id="teamChart"></canvas>
+                <div class="team-list" id="team-list"></div>
+            </div>
+        </div>
+        
+        <div class="auto-refresh">
+            <span class="pulse"></span>
+            <span id="data-source-indicator">로딩 중...</span> · 마지막 업데이트: <span id="last-update">-</span>
+        </div>
+        
+        <div class="footer">
+            Made with ⚡ by Thomas Edison · Powered by 차란 CX Team
+        </div>
+    </div>
+    
+    <script>
+        // 데모 데이터 생성 함수
+        function generateDemoData() {
+            const currentHour = new Date().getHours();
+            const hourlyPattern = [
+                2, 1, 0, 0, 1, 2,  // 0-5시
+                5, 8, 12, 18, 22, 25,  // 6-11시
+                28, 30, 26, 24, 20, 18,  // 12-17시
+                15, 12, 8, 6, 4, 3  // 18-23시
+            ];
+            
+            const hourlyData = [];
+            for (let i = 0; i < 24; i++) {
+                if (i <= currentHour) {
+                    const base = hourlyPattern[i];
+                    const variation = Math.floor(Math.random() * 6) - 2;
+                    hourlyData.push(Math.max(0, base + variation));
+                } else {
+                    hourlyData.push(0);
+                }
+            }
+            
+            const totalToday = hourlyData.reduce((a, b) => a + b, 0);
+            const openCount = Math.floor(Math.random() * 10) + 5;
+            const closedCount = totalToday - openCount;
+            const avgResponseTime = Math.floor(Math.random() * 240) + 180;
+            
+            return {
+                total_today: totalToday,
+                open: openCount,
+                closed: closedCount,
+                avg_response_time: avgResponseTime,
+                hourly_data: hourlyData,
+                team_performance: [
+                    {name: "김민지", handled: 45, avg_time: 245},
+                    {name: "이서연", handled: 38, avg_time: 312},
+                    {name: "박지훈", handled: 42, avg_time: 278},
+                    {name: "최유진", handled: 35, avg_time: 290}
+                ],
+                csat_score: (Math.random() * 0.6 + 4.2).toFixed(1)
+            };
+        }
+        
+        // 시간대별 차트
+        const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+        const hourlyChart = new Chart(hourlyCtx, {
+            type: 'bar',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i}시`),
+                datasets: [{
+                    label: '대화 수',
+                    data: Array(24).fill(0),
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return null;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(102, 126, 234, 0.5)');
+                        gradient.addColorStop(1, 'rgba(118, 75, 162, 0.8)');
+                        return gradient;
+                    },
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 5 },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+        
+        // 팀원별 차트
+        const teamCtx = document.getElementById('teamChart').getContext('2d');
+        const teamChart = new Chart(teamCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(118, 75, 162, 0.8)',
+                        'rgba(243, 156, 18, 0.8)',
+                        'rgba(46, 204, 113, 0.8)'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 13 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 12
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                }
+            }
+        });
+        
+        // 데이터 업데이트 함수
+        async function updateDashboard() {
+            let data;
+            
+            try {
+                // Vercel API 호출 (캐시 무효화)
+                const response = await fetch('/api/stats?v=' + Date.now());
+                data = await response.json();
+                
+                // 디버깅: 데이터 소스 확인
+                console.log('API 응답:', data.data_source);
+            } catch (error) {
+                console.error('API 호출 실패, 데모 데이터 사용:', error);
+                data = generateDemoData();
+            }
+            
+            // KPI 업데이트
+            animateValue('total-today', data.total_today);
+            animateValue('open-count', data.open);
+            animateValue('closed-count', data.closed);
+            animateValue('market-count', data.market_count || 0);
+            animateValue('cared-count', data.cared_count || 0);
+            
+            const avgMinutes = Math.round(data.avg_response_time / 60);
+            document.getElementById('avg-response').textContent = `${avgMinutes}분`;
+            document.getElementById('csat-score').textContent = `${data.csat_score}/5.0`;
+            
+            // 시간대별 차트
+            hourlyChart.data.datasets[0].data = data.hourly_data;
+            hourlyChart.update();
+            
+            // 팀원별 차트
+            teamChart.data.labels = data.team_performance.map(t => t.name);
+            teamChart.data.datasets[0].data = data.team_performance.map(t => t.handled);
+            teamChart.update();
+            
+            // 팀원 리스트
+            const teamList = document.getElementById('team-list');
+            teamList.innerHTML = data.team_performance.map(member => `
+                <div class="team-member">
+                    <div class="team-name">${member.name}</div>
+                    <div class="team-stats">
+                        <div class="team-stat-item">처리: <strong>${member.handled}</strong>건</div>
+                        <div class="team-stat-item">평균: <strong>${Math.round(member.avg_time / 60)}</strong>분</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // 데이터 소스 표시
+            const sourceIndicator = document.getElementById('data-source-indicator');
+            if (data.data_source && data.data_source.includes('실시간')) {
+                sourceIndicator.textContent = '✅ 실시간 데이터';
+                sourceIndicator.style.color = '#27ae60';
+            } else {
+                sourceIndicator.textContent = '⚠️ 데모 데이터';
+                sourceIndicator.style.color = '#e74c3c';
+            }
+            
+            // 업데이트 시간
+            const now = new Date();
+            document.getElementById('last-update').textContent = now.toLocaleTimeString('ko-KR');
+        }
+        
+        // 숫자 애니메이션
+        function animateValue(id, end) {
+            const element = document.getElementById(id);
+            const start = parseInt(element.textContent) || 0;
+            const duration = 800;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + (end - start) * easeProgress);
+                element.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+        
+        // 초기 로드
+        updateDashboard();
+        
+        // 5분마다 자동 새로고침
+        setInterval(updateDashboard, 300000);
+    </script>
+</body>
+</html>

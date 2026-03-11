@@ -58,6 +58,32 @@
             color: #7f8c8d;
             font-size: 15px;
         }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tab {
+            padding: 10px 24px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
         
         .kpi-grid {
             display: grid;
@@ -115,474 +141,321 @@
         .kpi-card:nth-child(3) { animation-delay: 0.3s; }
         .kpi-card:nth-child(4) { animation-delay: 0.4s; }
         .kpi-card:nth-child(5) { animation-delay: 0.5s; }
-        
-        .kpi-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-            display: block;
-        }
+        .kpi-card:nth-child(6) { animation-delay: 0.6s; }
+        .kpi-card:nth-child(7) { animation-delay: 0.7s; }
         
         .kpi-label {
             font-size: 14px;
             color: #95a5a6;
-            margin-bottom: 10px;
-            font-weight: 500;
+            margin-bottom: 12px;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
         
         .kpi-value {
             font-size: 42px;
             font-weight: 800;
-            margin-bottom: 8px;
-            line-height: 1;
-        }
-        
-        .kpi-card.total .kpi-value { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .kpi-card.open .kpi-value { color: #f39c12; }
-        .kpi-card.closed .kpi-value { color: #27ae60; }
-        .kpi-card.response .kpi-value { color: #e74c3c; }
-        .kpi-card.csat .kpi-value { color: #3498db; }
         
-        .kpi-change {
-            font-size: 13px;
-            color: #27ae60;
-            font-weight: 600;
+        .kpi-unit {
+            font-size: 18px;
+            color: #95a5a6;
+            margin-left: 4px;
         }
         
-        .kpi-change.negative {
-            color: #e74c3c;
-        }
-        
-        .charts-grid {
+        .chart-section {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 25px;
             margin-bottom: 25px;
         }
         
-        .chart-container {
+        .chart-card {
             background: white;
-            padding: 35px;
+            padding: 30px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             animation: fadeInUp 0.8s ease-out;
-            animation-fill-mode: backwards;
         }
         
-        .chart-container h2 {
+        .chart-title {
             font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 25px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
         }
         
-        .chart-container h2::before {
-            content: '';
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 2px;
+        canvas {
+            max-height: 350px;
         }
         
-        .auto-refresh {
-            text-align: center;
-            color: rgba(255,255,255,0.9);
-            font-size: 13px;
-            margin-top: 20px;
-            padding: 12px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
+        .member-list {
+            margin-top: 25px;
         }
         
-        .pulse {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #27ae60;
-            border-radius: 50%;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(1.1);
-            }
-        }
-        
-        .team-list {
-            margin-top: 20px;
-        }
-        
-        .team-member {
+        .member-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 16px;
             background: #f8f9fa;
             border-radius: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             transition: all 0.3s;
         }
         
-        .team-member:hover {
+        .member-item:hover {
             background: #e9ecef;
             transform: translateX(5px);
         }
         
-        .team-name {
+        .member-name {
             font-weight: 600;
             color: #2c3e50;
             font-size: 15px;
         }
         
-        .team-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 13px;
-            color: #7f8c8d;
-        }
-        
-        .team-stat-item strong {
-            color: #2c3e50;
+        .member-count {
+            font-size: 18px;
             font-weight: 700;
+            color: #667eea;
         }
         
-        .footer {
+        .last-update {
             text-align: center;
-            color: rgba(255,255,255,0.8);
+            color: white;
+            margin-top: 20px;
             font-size: 13px;
-            margin-top: 30px;
-            padding: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .kpi-grid, .charts-grid {
-                grid-template-columns: 1fr;
-            }
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 차란 CX 실시간 대시보드</h1>
-            <div class="subtitle">고객 응대 현황 모니터링 · 자동 새로고침 30초</div>
+            <h1>📊 차란 CX 실시간 대시보드 <span id="currentDate" style="font-size: 20px; color: #7f8c8d;"></span></h1>
+            <div class="subtitle">채널톡 고객응대 현황</div>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('daily')">Daily</button>
+                <button class="tab" onclick="switchTab('weekly')">Weekly</button>
+            </div>
         </div>
-        
+
         <div class="kpi-grid">
-            <div class="kpi-card total">
-                <span class="kpi-icon">💬</span>
-                <div class="kpi-label">오늘 총 대화</div>
-                <div class="kpi-value" id="total-today">-</div>
-                <div class="kpi-change">+12% vs 어제</div>
+            <div class="kpi-card">
+                <div class="kpi-label">총 대화</div>
+                <div class="kpi-value" id="totalChats">-</div>
             </div>
-            
-            <div class="kpi-card open">
-                <span class="kpi-icon">🟡</span>
-                <div class="kpi-label">진행 중</div>
-                <div class="kpi-value" id="open-count">-</div>
-                <div class="kpi-change">실시간</div>
-            </div>
-            
-            <div class="kpi-card closed">
-                <span class="kpi-icon">✅</span>
-                <div class="kpi-label">완료</div>
-                <div class="kpi-value" id="closed-count">-</div>
-                <div class="kpi-change">+8% vs 어제</div>
-            </div>
-            
-            <div class="kpi-card response">
-                <span class="kpi-icon">⚡</span>
-                <div class="kpi-label">평균 응답 시간</div>
-                <div class="kpi-value" id="avg-response">-</div>
-                <div class="kpi-change negative">목표: 3분 이내</div>
-            </div>
-            
-            <div class="kpi-card csat">
-                <span class="kpi-icon">⭐</span>
-                <div class="kpi-label">고객 만족도 (CSAT)</div>
-                <div class="kpi-value" id="csat-score">-</div>
-                <div class="kpi-change">+0.2 vs 지난주</div>
-            </div>
-        </div>
-        
-        <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px;">
-            <div class="kpi-card" style="border-left: 4px solid #3498db;">
-                <span class="kpi-icon">🛒</span>
-                <div class="kpi-label">마켓 문의</div>
-                <div class="kpi-value" id="market-count" style="color: #3498db;">-</div>
-                <div class="kpi-change">구매 관련</div>
-            </div>
-            
-            <div class="kpi-card" style="border-left: 4px solid #9b59b6;">
-                <span class="kpi-icon">📦</span>
+            <div class="kpi-card">
                 <div class="kpi-label">케어드 문의</div>
-                <div class="kpi-value" id="cared-count" style="color: #9b59b6;">-</div>
-                <div class="kpi-change">위탁 관련</div>
+                <div class="kpi-value" id="caredChats">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">마켓 문의</div>
+                <div class="kpi-value" id="marketChats">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">진행 중</div>
+                <div class="kpi-value" id="openChats">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">완료</div>
+                <div class="kpi-value" id="closedChats">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">평균 응답시간</div>
+                <div class="kpi-value" id="avgResponse">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">고객 만족도</div>
+                <div class="kpi-value" id="csat">-</div>
             </div>
         </div>
-        
-        <div class="charts-grid">
-            <div class="chart-container">
-                <h2>시간대별 대화량</h2>
+
+        <div class="chart-section">
+            <div class="chart-card">
+                <div class="chart-title" id="chartTitle">시간대별 대화량</div>
                 <canvas id="hourlyChart"></canvas>
             </div>
-            
-            <div class="chart-container">
-                <h2>팀원별 처리 현황</h2>
-                <canvas id="teamChart"></canvas>
-                <div class="team-list" id="team-list"></div>
+            <div class="chart-card">
+                <div class="chart-title">팀원별 처리 현황</div>
+                <canvas id="memberChart"></canvas>
+                <div class="member-list" id="memberList"></div>
             </div>
         </div>
-        
-        <div class="auto-refresh">
-            <span class="pulse"></span>
-            <span id="data-source-indicator">로딩 중...</span> · 마지막 업데이트: <span id="last-update">-</span>
-        </div>
-        
-        <div class="footer">
-            Made with ⚡ by Thomas Edison · Powered by 차란 CX Team
-        </div>
+
+        <div class="last-update" id="lastUpdate"></div>
     </div>
-    
+
     <script>
-        // 데모 데이터 생성 함수
-        function generateDemoData() {
-            const currentHour = new Date().getHours();
-            const hourlyPattern = [
-                2, 1, 0, 0, 1, 2,  // 0-5시
-                5, 8, 12, 18, 22, 25,  // 6-11시
-                28, 30, 26, 24, 20, 18,  // 12-17시
-                15, 12, 8, 6, 4, 3  // 18-23시
-            ];
-            
-            const hourlyData = [];
-            for (let i = 0; i < 24; i++) {
-                if (i <= currentHour) {
-                    const base = hourlyPattern[i];
-                    const variation = Math.floor(Math.random() * 6) - 2;
-                    hourlyData.push(Math.max(0, base + variation));
-                } else {
-                    hourlyData.push(0);
-                }
-            }
-            
-            const totalToday = hourlyData.reduce((a, b) => a + b, 0);
-            const openCount = Math.floor(Math.random() * 10) + 5;
-            const closedCount = totalToday - openCount;
-            const avgResponseTime = Math.floor(Math.random() * 240) + 180;
-            
-            return {
-                total_today: totalToday,
-                open: openCount,
-                closed: closedCount,
-                avg_response_time: avgResponseTime,
-                hourly_data: hourlyData,
-                team_performance: [
-                    {name: "김민지", handled: 45, avg_time: 245},
-                    {name: "이서연", handled: 38, avg_time: 312},
-                    {name: "박지훈", handled: 42, avg_time: 278},
-                    {name: "최유진", handled: 35, avg_time: 290}
-                ],
-                csat_score: (Math.random() * 0.6 + 4.2).toFixed(1)
-            };
+        let currentPeriod = 'daily';
+        let hourlyChart, memberChart;
+
+        // 날짜 표시
+        function updateDateDisplay() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('currentDate').textContent = `(${year}.${month}.${day})`;
         }
-        
-        // 시간대별 차트
-        const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
-        const hourlyChart = new Chart(hourlyCtx, {
-            type: 'bar',
-            data: {
-                labels: Array.from({length: 24}, (_, i) => `${i}시`),
-                datasets: [{
-                    label: '대화 수',
-                    data: Array(24).fill(0),
-                    backgroundColor: function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) return null;
-                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        gradient.addColorStop(0, 'rgba(102, 126, 234, 0.5)');
-                        gradient.addColorStop(1, 'rgba(118, 75, 162, 0.8)');
-                        return gradient;
-                    },
-                    borderColor: 'rgba(102, 126, 234, 1)',
-                    borderWidth: 2,
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        padding: 12,
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 13 }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 5 },
-                        grid: { color: 'rgba(0,0,0,0.05)' }
-                    },
-                    x: {
-                        grid: { display: false }
-                    }
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart'
-                }
+
+        // 탭 전환
+        function switchTab(period) {
+            currentPeriod = period;
+            
+            // 탭 활성화
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 차트 제목 변경
+            if (period === 'daily') {
+                document.getElementById('chartTitle').textContent = '시간대별 대화량';
+            } else {
+                document.getElementById('chartTitle').textContent = '일별 대화량 (최근 7일)';
             }
-        });
-        
-        // 팀원별 차트
-        const teamCtx = document.getElementById('teamChart').getContext('2d');
-        const teamChart = new Chart(teamCtx, {
-            type: 'doughnut',
-            data: {
-                labels: [],
-                datasets: [{
-                    data: [],
-                    backgroundColor: [
-                        'rgba(102, 126, 234, 0.8)',
-                        'rgba(118, 75, 162, 0.8)',
-                        'rgba(243, 156, 18, 0.8)',
-                        'rgba(46, 204, 113, 0.8)'
-                    ],
-                    borderWidth: 3,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: { size: 13 }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        padding: 12
-                    }
-                },
-                animation: {
-                    animateRotate: true,
-                    animateScale: true
-                }
-            }
-        });
-        
-        // 데이터 업데이트 함수
+
+            // 데이터 갱신
+            updateDashboard();
+        }
+
         async function updateDashboard() {
-            let data;
-            
             try {
-                // Vercel API 호출 (캐시 무효화)
-                const response = await fetch('/api/stats?v=' + Date.now());
-                data = await response.json();
-                
-                // 디버깅: 데이터 소스 확인
-                console.log('API 응답:', data.data_source);
+                const response = await fetch(`/api/stats?period=${currentPeriod}`);
+                const data = await response.json();
+
+                // KPI 업데이트
+                document.getElementById('totalChats').textContent = data.total_chats || 0;
+                document.getElementById('caredChats').textContent = data.cared_chats || 0;
+                document.getElementById('marketChats').textContent = data.market_chats || 0;
+                document.getElementById('openChats').textContent = data.open_chats || 0;
+                document.getElementById('closedChats').textContent = data.closed_chats || 0;
+                document.getElementById('avgResponse').textContent = data.avg_response_time || '-';
+                document.getElementById('csat').textContent = data.csat ? `${data.csat}/5.0` : '-';
+
+                // 시간대별/일별 차트 업데이트
+                updateHourlyChart(data.hourly_data || data.daily_data);
+
+                // 팀원별 차트 업데이트
+                updateMemberChart(data.member_stats);
+
+                // 마지막 업데이트 시간
+                document.getElementById('lastUpdate').textContent = 
+                    `마지막 업데이트: ${new Date().toLocaleString('ko-KR')}`;
+
             } catch (error) {
-                console.error('API 호출 실패, 데모 데이터 사용:', error);
-                data = generateDemoData();
+                console.error('데이터 로드 실패:', error);
             }
+        }
+
+        function updateHourlyChart(data) {
+            const ctx = document.getElementById('hourlyChart');
             
-            // KPI 업데이트
-            animateValue('total-today', data.total_today);
-            animateValue('open-count', data.open);
-            animateValue('closed-count', data.closed);
-            animateValue('market-count', data.market_count || 0);
-            animateValue('cared-count', data.cared_count || 0);
+            if (hourlyChart) {
+                hourlyChart.destroy();
+            }
+
+            const labels = currentPeriod === 'daily' 
+                ? Array.from({length: 24}, (_, i) => `${i}시`)
+                : data.map(d => d.label);
             
-            const avgMinutes = Math.round(data.avg_response_time / 60);
-            document.getElementById('avg-response').textContent = `${avgMinutes}분`;
-            document.getElementById('csat-score').textContent = `${data.csat_score}/5.0`;
+            const values = currentPeriod === 'daily'
+                ? Array.from({length: 24}, (_, i) => {
+                    const found = data.find(d => d.hour === i);
+                    return found ? found.count : 0;
+                })
+                : data.map(d => d.count);
+
+            hourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '대화 수',
+                        data: values,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMemberChart(members) {
+            const ctx = document.getElementById('memberChart');
             
-            // 시간대별 차트
-            hourlyChart.data.datasets[0].data = data.hourly_data;
-            hourlyChart.update();
-            
-            // 팀원별 차트
-            teamChart.data.labels = data.team_performance.map(t => t.name);
-            teamChart.data.datasets[0].data = data.team_performance.map(t => t.handled);
-            teamChart.update();
-            
-            // 팀원 리스트
-            const teamList = document.getElementById('team-list');
-            teamList.innerHTML = data.team_performance.map(member => `
-                <div class="team-member">
-                    <div class="team-name">${member.name}</div>
-                    <div class="team-stats">
-                        <div class="team-stat-item">처리: <strong>${member.handled}</strong>건</div>
-                        <div class="team-stat-item">평균: <strong>${Math.round(member.avg_time / 60)}</strong>분</div>
-                    </div>
+            if (memberChart) {
+                memberChart.destroy();
+            }
+
+            const names = members.map(m => m.name);
+            const counts = members.map(m => m.count);
+
+            memberChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: names,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(237, 100, 166, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(75, 192, 192, 0.8)'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { size: 13, weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 팀원 리스트 업데이트
+            const listHtml = members.map(m => `
+                <div class="member-item">
+                    <span class="member-name">${m.name}</span>
+                    <span class="member-count">${m.count}건</span>
                 </div>
             `).join('');
-            
-            // 데이터 소스 표시
-            const sourceIndicator = document.getElementById('data-source-indicator');
-            if (data.data_source && data.data_source.includes('실시간')) {
-                sourceIndicator.textContent = '✅ 실시간 데이터';
-                sourceIndicator.style.color = '#27ae60';
-            } else {
-                sourceIndicator.textContent = '⚠️ 데모 데이터';
-                sourceIndicator.style.color = '#e74c3c';
-            }
-            
-            // 업데이트 시간
-            const now = new Date();
-            document.getElementById('last-update').textContent = now.toLocaleTimeString('ko-KR');
+            document.getElementById('memberList').innerHTML = listHtml;
         }
-        
-        // 숫자 애니메이션
-        function animateValue(id, end) {
-            const element = document.getElementById(id);
-            const start = parseInt(element.textContent) || 0;
-            const duration = 800;
-            const startTime = performance.now();
-            
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = 1 - Math.pow(1 - progress, 3);
-                const current = Math.round(start + (end - start) * easeProgress);
-                element.textContent = current;
-                
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                }
-            }
-            
-            requestAnimationFrame(update);
-        }
-        
-        // 초기 로드
+
+        // 초기화
+        updateDateDisplay();
         updateDashboard();
         
         // 5분마다 자동 새로고침
