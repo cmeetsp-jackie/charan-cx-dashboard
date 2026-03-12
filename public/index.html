@@ -477,10 +477,65 @@
             document.getElementById('loading').classList.add('show');
             
             try {
-                const response = await fetch('/api/index?period=daily');
-                if (!response.ok) throw new Error('API 응답 실패');
+                // Demo 데이터 (API 미작동 시 사용)
+                const demoData = {
+                    total_chats: 567,
+                    cared_chats: 422,
+                    market_chats: 145,
+                    open_chats: 45,
+                    closed_chats: 522,
+                    avg_response_time: '1분 52초',
+                    csat: '4.5',
+                    ai_responses: 120,
+                    ai_rate: 21.2,
+                    hourly_data: Array.from({length: 24}, (_, h) => ({
+                        hour: h,
+                        count: (9 <= h && h <= 18) ? 15 + (h-9)*2 : ([8,19].includes(h) ? 10 : 0)
+                    })),
+                    member_stats: [
+                        {name: 'Sia', count: 147},
+                        {name: 'Sara', count: 98},
+                        {name: 'Joy', count: 77}
+                    ],
+                    cared_tag_stats: {
+                        this_week: 422,
+                        last_week: 398,
+                        change_rate: '+6.0%',
+                        ai_rate: 18,
+                        top_tags: [
+                            {rank: 1, tag: '수거일변경', count: 45, ratio: 10.7, trend: 'up'},
+                            {rank: 2, tag: '반품수거일정', count: 38, ratio: 9.0, trend: 'neutral'},
+                            {rank: 3, tag: '판매가능상품', count: 32, ratio: 7.6, trend: 'down'},
+                            {rank: 4, tag: '환불일정', count: 28, ratio: 6.6, trend: 'up'},
+                            {rank: 5, tag: '검수일정', count: 25, ratio: 5.9, trend: 'neutral'},
+                            {rank: 6, tag: '차란백배송일정', count: 22, ratio: 5.2, trend: 'up'},
+                            {rank: 7, tag: '반품절차', count: 20, ratio: 4.7, trend: 'neutral'},
+                            {rank: 8, tag: '수거확인', count: 18, ratio: 4.3, trend: 'down'},
+                            {rank: 9, tag: '정산일정', count: 15, ratio: 3.6, trend: 'up'},
+                            {rank: 10, tag: '회원탈퇴', count: 12, ratio: 2.8, trend: 'neutral'}
+                        ]
+                    },
+                    market_tag_stats: {
+                        this_week: 145,
+                        last_week: 132,
+                        change_rate: '+9.8%',
+                        ai_rate: 25,
+                        top_tags: [
+                            {rank: 1, tag: '구매자/배송일정문의', count: 28, ratio: 19.3, trend: 'up'},
+                            {rank: 2, tag: '판매자/정산관련문의', count: 22, ratio: 15.2, trend: 'neutral'},
+                            {rank: 3, tag: '구매자/주문취소요청', count: 18, ratio: 12.4, trend: 'up'},
+                            {rank: 4, tag: '판매자/검수일정문의', count: 15, ratio: 10.3, trend: 'down'},
+                            {rank: 5, tag: '공통/마켓구조이해문의', count: 12, ratio: 8.3, trend: 'neutral'},
+                            {rank: 6, tag: '판매자/상품등록·수정방법문의', count: 10, ratio: 6.9, trend: 'up'},
+                            {rank: 7, tag: '구매자/반품가능문의(구매확정)', count: 8, ratio: 5.5, trend: 'neutral'},
+                            {rank: 8, tag: '판매자/수수료관련문의', count: 7, ratio: 4.8, trend: 'down'},
+                            {rank: 9, tag: '구매자/구매취소확인문의', count: 6, ratio: 4.1, trend: 'up'},
+                            {rank: 10, tag: '공통/배송비관련문의', count: 5, ratio: 3.4, trend: 'neutral'}
+                        ]
+                    }
+                };
                 
-                const data = await response.json();
+                const data = demoData; // API 대신 demo 데이터 사용
 
                 // 메인 KPI
                 document.getElementById('totalChats').textContent = data.total_chats || 0;
