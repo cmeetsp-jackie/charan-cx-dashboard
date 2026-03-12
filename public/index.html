@@ -189,15 +189,52 @@
         }
         
         .kpi-label {
-            font-size: 12px;
+            font-size: 14px;
             color: #95a5a6;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 600;
             text-transform: uppercase;
         }
         
         .kpi-value {
-            font-size: 32px;
+            font-size: 40px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bottom-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .bottom-kpi-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .bottom-kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        .bottom-kpi-label {
+            font-size: 16px;
+            color: #95a5a6;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .bottom-kpi-value {
+            font-size: 56px;
             font-weight: 800;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
@@ -348,14 +385,6 @@
                         <div class="kpi-value" id="totalChats">-</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">케어드 문의</div>
-                        <div class="kpi-value" id="caredChats">-</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">마켓 문의</div>
-                        <div class="kpi-value" id="marketChats">-</div>
-                    </div>
-                    <div class="kpi-card">
                         <div class="kpi-label">문의 응대중</div>
                         <div class="kpi-value" id="openChats">-</div>
                     </div>
@@ -382,6 +411,17 @@
                         <div class="chart-title">팀원별 처리 현황</div>
                         <canvas id="memberChart"></canvas>
                         <div class="member-list" id="memberList"></div>
+                    </div>
+                </div>
+
+                <div class="bottom-kpi-grid">
+                    <div class="bottom-kpi-card">
+                        <div class="bottom-kpi-label">케어드 문의</div>
+                        <div class="bottom-kpi-value" id="caredChats">-</div>
+                    </div>
+                    <div class="bottom-kpi-card">
+                        <div class="bottom-kpi-label">마켓 문의</div>
+                        <div class="bottom-kpi-value" id="marketChats">-</div>
                     </div>
                 </div>
             </div>
