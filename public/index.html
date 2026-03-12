@@ -393,6 +393,10 @@
                         <div class="kpi-value" id="closedChats">-</div>
                     </div>
                     <div class="kpi-card">
+                        <div class="kpi-label">AI 응답건수/응답률</div>
+                        <div class="kpi-value" id="aiResponses">-</div>
+                    </div>
+                    <div class="kpi-card">
                         <div class="kpi-label">평균 응답시간</div>
                         <div class="kpi-value" id="avgResponse">-</div>
                     </div>
@@ -488,6 +492,12 @@
                 document.getElementById('marketChats').textContent = data.market_chats || 0;
                 document.getElementById('openChats').textContent = data.open_chats || 0;
                 document.getElementById('closedChats').textContent = data.closed_chats || 0;
+                
+                // AI 응답건수/응답률
+                const aiText = `${data.ai_responses || 0}건 / ${data.ai_rate || 0}%`;
+                document.getElementById('aiResponses').textContent = aiText;
+                document.getElementById('aiResponses').style.fontSize = '28px';
+                
                 document.getElementById('avgResponse').textContent = data.avg_response_time || '-';
                 document.getElementById('csat').textContent = data.csat ? `${data.csat}/5.0` : '-';
 

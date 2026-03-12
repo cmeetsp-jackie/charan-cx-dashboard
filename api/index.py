@@ -123,6 +123,10 @@ def get_daily_stats(access_key, access_secret):
         # 응답시간
         avg_response = calculate_avg_response(today_chats)
         
+        # AI 응답 통계 (closed 상태이면서 assigneeId 없는 경우)
+        ai_responses = sum(1 for c in today_chats if c.get('state') == 'closed' and not c.get('assigneeId'))
+        ai_rate = round((ai_responses / len(today_chats) * 100), 1) if len(today_chats) > 0 else 0
+        
         return {
             'total_chats': len(today_chats),
             'cared_chats': len(cared_chats),
@@ -131,6 +135,8 @@ def get_daily_stats(access_key, access_secret):
             'closed_chats': sum(1 for c in today_chats if c.get('state') == 'closed'),
             'avg_response_time': avg_response,
             'csat': '4.5',
+            'ai_responses': ai_responses,
+            'ai_rate': ai_rate,
             'hourly_data': hourly_data,
             'member_stats': member_stats,
             'cared_tag_stats': cared_tag_stats,
