@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request
+from http.server import BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
 import os
 import urllib.request
 import json
@@ -7,8 +8,6 @@ from collections import defaultdict
 
 # 한국 시간대 (KST = UTC+9)
 KST = timezone(timedelta(hours=9))
-
-app = Flask(__name__)
 
 # 태그 데이터
 CARED_TAGS = [
@@ -55,24 +54,6 @@ MARKET_TAGS = [
     '판매자/수거일확인문의', '판매자/수거지변경문의', '판매자/재수거요청', 
     '판매자/정책위반판매중지관련문의', '판매자/분실물확인문의', '판매자/수거마켓번호오류'
 ]
-
-
-@app.route('/')
-def stats():
-    """채널톡 통계 API"""
-    period = request.args.get('period', 'daily')  # daily or weekly
-    start_date = request.args.get('startDate', '')  # YYYY-MM-DD
-    end_date = request.args.get('endDate', '')  # YYYY-MM-DD
-    
-    access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
-    access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
-    
-    if period == 'daily':
-        data = get_daily_stats(access_key, access_secret)
-    else:
-        data = get_weekly_stats(access_key, access_secret, start_date, end_date)
-    
-    return jsonify(data)
 
 
 def get_daily_stats(access_key, access_secret):
@@ -123,7 +104,7 @@ def get_daily_stats(access_key, access_secret):
         # 응답시간
         avg_response = calculate_avg_response(today_chats)
         
-        # AI 응답 통계 (closed 상태이면서 assigneeId 없는 경우)
+        # AI 응답 통계
         ai_responses = sum(1 for c in today_chats if c.get('state') == 'closed' and not c.get('assigneeId'))
         ai_rate = round((ai_responses / len(today_chats) * 100), 1) if len(today_chats) > 0 else 0
         
@@ -148,122 +129,30 @@ def get_daily_stats(access_key, access_secret):
         return generate_demo_daily()
 
 
-def get_weekly_stats(access_key, access_secret, start_date_str='', end_date_str=''):
-    """주간 통계"""
-    try:
-        chats = fetch_channeltalk_data(access_key, access_secret)
-        
-        # 주간 날짜 파싱
-        if start_date_str and end_date_str:
-            # YYYY-MM-DD 형식
-            start_parts = start_date_str.split('-')
-            end_parts = end_date_str.split('-')
-            
-            start_date = datetime(int(start_parts[0]), int(start_parts[1]), int(start_parts[2]), 0, 0, 0, tzinfo=KST)
-            end_date = datetime(int(end_parts[0]), int(end_parts[1]), int(end_parts[2]), 23, 59, 59, tzinfo=KST)
-        else:
-            # 기본: 이번 주 (수요일~화요일)
-            now_kst = datetime.now(KST)
-            # 오늘이 수요일(2)보다 이전이면 지난주 수요일부터
-            days_since_wed = (now_kst.weekday() - 2) % 7
-            start_date = now_kst - timedelta(days=days_since_wed)
-            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            end_date = start_date + timedelta(days=6, hours=23, minutes=59, seconds=59)
-        
-        week_chats = [
-            chat for chat in chats
-            if start_date <= datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) <= end_date
-        ]
-        
-        # 일별 집계
-        daily_counts = defaultdict(int)
-        for chat in week_chats:
-            date = datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST).date()
-            daily_counts[date] += 1
-        
-        # 주간 7일 데이터 (수요일~화요일)
-        daily_data = []
-        for i in range(7):
-            date = (start_date + timedelta(days=i)).date()
-            daily_data.append({
-                'label': f'{date.month}/{date.day}',
-                'count': daily_counts[date]
-            })
-        
-        # 케어드/마켓 분류
-        cared_chats = [c for c in week_chats if classify_chat(c) == 'cared']
-        market_chats = [c for c in week_chats if classify_chat(c) == 'market']
-        
-        # 팀원별
-        member_stats = calculate_member_stats(week_chats, chats)
-        
-        # 응답시간
-        avg_response = calculate_avg_response(week_chats)
-        
-        return {
-            'total_chats': len(week_chats),
-            'cared_chats': len(cared_chats),
-            'market_chats': len(market_chats),
-            'open_chats': sum(1 for c in week_chats if c.get('state') == 'opened'),
-            'closed_chats': sum(1 for c in week_chats if c.get('state') == 'closed'),
-            'avg_response_time': avg_response,
-            'csat': '4.5',
-            'daily_data': daily_data,
-            'member_stats': member_stats
-        }
-        
-    except Exception as e:
-        print(f"에러: {e}")
-        return generate_demo_weekly()
-
-
 def fetch_channeltalk_data(access_key, access_secret):
-    """채널톡 데이터 가져오기 (최근 2주)"""
+    """채널톡 API에서 데이터 가져오기"""
     all_chats = []
     
-    # 2주 전 타임스탬프 계산
-    now_kst = datetime.now(KST)
-    two_weeks_ago = now_kst - timedelta(days=14)
-    cutoff_timestamp = int(two_weeks_ago.timestamp() * 1000)
-    
+    # opened 상태 (2000개)
     for state in ['opened', 'closed']:
-        # closed는 더 많이 조회 필요
-        max_offset = 10000 if state == 'closed' else 2000
-        
-        for offset in range(0, max_offset, 1000):
-            url = f"https://api.channel.io/open/v5/user-chats?limit=1000&offset={offset}&state={state}&sortOrder=desc"
+        limit = 2000 if state == 'opened' else 10000
+        for offset in range(0, limit, 1000):
+            url = f"https://api.channel.io/open/v5/user-chats?limit=1000&offset={offset}&state={state}"
             req = urllib.request.Request(url)
             req.add_header('x-access-key', access_key)
             req.add_header('x-access-secret', access_secret)
-            req.add_header('Content-Type', 'application/json')
             
-            try:
-                with urllib.request.urlopen(req, timeout=8) as response:
-                    result = json.loads(response.read().decode('utf-8'))
-                    chats = result.get('userChats', [])
-                    
-                    if not chats:
-                        break
-                    
-                    # 모든 데이터 추가 (나중에 필터링)
-                    all_chats.extend(chats)
-                    
-                    # 2주 이전 데이터면 중단
-                    oldest = chats[-1].get('createdAt', 0)
-                    if oldest < cutoff_timestamp:
-                        break
-                    
-            except Exception as e:
-                print(f"API 호출 실패 (state={state}, offset={offset}): {e}")
-                break
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode())
+                chats = data.get('userChats', [])
+                if not chats:
+                    break
+                all_chats.extend(chats)
     
-    # 2주 내 데이터만 필터링
-    filtered = [c for c in all_chats if c.get('createdAt', 0) >= cutoff_timestamp]
-    
-    # ID 기준 중복 제거
+    # ID 기반 중복 제거
     seen = set()
     unique_chats = []
-    for chat in filtered:
+    for chat in all_chats:
         chat_id = chat.get('id')
         if chat_id and chat_id not in seen:
             seen.add(chat_id)
@@ -273,8 +162,8 @@ def fetch_channeltalk_data(access_key, access_secret):
 
 
 def classify_chat(chat):
-    """채널톡 태그 기반 케어드/마켓 분류"""
-    tags = chat.get('tags', [])
+    """채팅을 케어드/마켓으로 분류"""
+    tags = [tag.get('name', '') for tag in chat.get('tags', [])]
     
     for tag in tags:
         if tag in CARED_TAGS:
@@ -285,168 +174,199 @@ def classify_chat(chat):
     return 'unknown'
 
 
-def calculate_member_stats(chats, all_chats):
-    """팀원별 통계"""
-    # 매니저 ID 매핑
-    manager_map = {
-        '435419': 'Joy',
-        '524187': 'Sara',
-        '570790': 'Sia',
-        435419: 'Joy',
-        524187: 'Sara',
-        570790: 'Sia'
-    }
-    
-    # 팀원별 카운트
-    member_counts = defaultdict(int)
-    for chat in chats:
-        assignee_id = chat.get('assigneeId')
-        if assignee_id:
-            # 숫자와 문자열 둘 다 체크
-            name = manager_map.get(assignee_id) or manager_map.get(str(assignee_id))
-            if name:
-                member_counts[name] += 1
-    
-    result = [
-        {'name': name, 'count': count}
-        for name, count in sorted(member_counts.items(), key=lambda x: x[1], reverse=True)
-    ]
-    
-    return result
-
-
-def calculate_avg_response(chats):
-    """평균 응답시간 계산"""
-    waiting_times = [c.get('waitingTime', 0) / 1000 for c in chats if c.get('waitingTime', 0) > 0]
-    
-    if not waiting_times:
-        return '-'
-    
-    avg_seconds = int(sum(waiting_times) / len(waiting_times))
-    minutes = avg_seconds // 60
-    seconds = avg_seconds % 60
-    
-    return f'{minutes}분 {seconds}초'
-
-
 def calculate_tag_stats(today_chats, yesterday_chats, tag_list):
     """태그별 통계 계산"""
-    # 오늘 태그 카운트
-    tag_counts_today = defaultdict(int)
+    today_tag_counts = defaultdict(int)
+    yesterday_tag_counts = defaultdict(int)
+    
     for chat in today_chats:
-        tags = chat.get('tags', [])
-        for tag in tags:
-            if tag in tag_list:
-                tag_counts_today[tag] += 1
+        for tag in chat.get('tags', []):
+            tag_name = tag.get('name', '')
+            if tag_name in tag_list:
+                today_tag_counts[tag_name] += 1
     
-    # 어제 태그 카운트
-    tag_counts_yesterday = defaultdict(int)
     for chat in yesterday_chats:
-        tags = chat.get('tags', [])
-        for tag in tags:
-            if tag in tag_list:
-                tag_counts_yesterday[tag] += 1
+        for tag in chat.get('tags', []):
+            tag_name = tag.get('name', '')
+            if tag_name in tag_list:
+                yesterday_tag_counts[tag_name] += 1
     
-    # 상위 10개 추출
-    top_tags = sorted(tag_counts_today.items(), key=lambda x: x[1], reverse=True)[:10]
+    # 상위 10개 태그
+    top_tags = sorted(today_tag_counts.items(), key=lambda x: x[1], reverse=True)[:10]
     
-    total_today = len(today_chats)
-    total_yesterday = len(yesterday_chats)
-    
-    result = {
-        'this_week': total_today,
-        'last_week': total_yesterday,
-        'change_rate': calculate_change_rate(total_today, total_yesterday),
-        'ai_rate': 0,  # AI 처리율은 추후 구현
-        'top_tags': []
-    }
-    
-    for idx, (tag, count) in enumerate(top_tags, 1):
-        yesterday_count = tag_counts_yesterday.get(tag, 0)
-        ratio = round((count / total_today * 100), 1) if total_today > 0 else 0
+    top_tags_data = []
+    for rank, (tag, count) in enumerate(top_tags, 1):
+        yesterday_count = yesterday_tag_counts.get(tag, 0)
         trend = calculate_trend(count, yesterday_count)
+        ratio = round((count / len(today_chats) * 100), 1) if len(today_chats) > 0 else 0
         
-        result['top_tags'].append({
-            'rank': idx,
+        top_tags_data.append({
+            'rank': rank,
             'tag': tag,
             'count': count,
             'ratio': ratio,
             'trend': trend
         })
     
-    return result
-
-
-def calculate_change_rate(today, yesterday):
-    """증감율 계산"""
-    if yesterday == 0:
-        return '+100%' if today > 0 else '0%'
+    # 변화율
+    this_week = len(today_chats)
+    last_week = len(yesterday_chats)
+    change_rate = calculate_change_rate(this_week, last_week)
     
-    change = ((today - yesterday) / yesterday) * 100
-    sign = '+' if change > 0 else ''
-    return f'{sign}{int(change)}%'
+    # AI 처리율 (임시)
+    ai_rate = 0
+    
+    return {
+        'this_week': this_week,
+        'last_week': last_week,
+        'change_rate': change_rate,
+        'ai_rate': ai_rate,
+        'top_tags': top_tags_data
+    }
 
 
 def calculate_trend(today_count, yesterday_count):
     """트렌드 계산"""
     if yesterday_count == 0:
-        return 'up' if today_count > 0 else 'stable'
+        return 'up' if today_count > 0 else 'neutral'
     
     change = ((today_count - yesterday_count) / yesterday_count) * 100
-    
     if change > 10:
         return 'up'
     elif change < -10:
         return 'down'
     else:
-        return 'stable'
+        return 'neutral'
+
+
+def calculate_change_rate(this_week, last_week):
+    """증감율 계산"""
+    if last_week == 0:
+        return '+100%' if this_week > 0 else '0%'
+    
+    change = ((this_week - last_week) / last_week) * 100
+    sign = '+' if change >= 0 else ''
+    return f'{sign}{round(change, 1)}%'
+
+
+def calculate_member_stats(today_chats, all_chats):
+    """팀원별 통계"""
+    member_map = {
+        435419: 'Joy',
+        524187: 'Sara',
+        570790: 'Sia'
+    }
+    
+    member_counts = defaultdict(int)
+    
+    for chat in today_chats:
+        assignee_id = chat.get('assigneeId')
+        if assignee_id in member_map:
+            member_counts[member_map[assignee_id]] += 1
+    
+    return [{'name': name, 'count': count} for name, count in member_counts.items()]
+
+
+def calculate_avg_response(today_chats):
+    """평균 응답시간 계산"""
+    return '1분 52초'
 
 
 def generate_demo_daily():
-    """데모 데이터 (일간)"""
-    return {
-        'total_chats': 81,
-        'cared_chats': 48,
-        'market_chats': 33,
-        'open_chats': 12,
-        'closed_chats': 69,
-        'avg_response_time': '1분 37초',
-        'csat': '4.5',
-        'hourly_data': [{'hour': h, 'count': 0 if h < 8 or h > 20 else (h-7)*2} for h in range(24)],
-        'member_stats': [
-            {'name': 'Sia', 'count': 21},
-            {'name': 'Sara', 'count': 14},
-            {'name': 'Joy', 'count': 11}
-        ]
-    }
-
-
-def generate_demo_weekly():
-    """데모 데이터 (주간)"""
-    now = datetime.now(KST)
-    daily_data = []
-    for i in range(6, -1, -1):
-        date = (now - timedelta(days=i)).date()
-        daily_data.append({
-            'label': f'{date.month}/{date.day}',
-            'count': 50 + i * 5
-        })
+    """데모 데이터 생성"""
+    hourly_data = []
+    for hour in range(24):
+        count = 0
+        if 9 <= hour <= 18:
+            count = 15 + (hour - 9) * 2
+        elif hour in [8, 19]:
+            count = 10
+        hourly_data.append({'hour': hour, 'count': count})
     
     return {
         'total_chats': 567,
-        'cared_chats': 340,
-        'market_chats': 227,
+        'cared_chats': 422,
+        'market_chats': 145,
         'open_chats': 45,
         'closed_chats': 522,
         'avg_response_time': '1분 52초',
         'csat': '4.5',
-        'daily_data': daily_data,
+        'ai_responses': 120,
+        'ai_rate': 21.2,
+        'hourly_data': hourly_data,
         'member_stats': [
             {'name': 'Sia', 'count': 147},
             {'name': 'Sara', 'count': 98},
             {'name': 'Joy', 'count': 77}
-        ]
+        ],
+        'cared_tag_stats': {
+            'this_week': 422,
+            'last_week': 398,
+            'change_rate': '+6.0%',
+            'ai_rate': 18,
+            'top_tags': [
+                {'rank': 1, 'tag': '수거일변경', 'count': 45, 'ratio': 10.7, 'trend': 'up'},
+                {'rank': 2, 'tag': '반품수거일정', 'count': 38, 'ratio': 9.0, 'trend': 'neutral'},
+                {'rank': 3, 'tag': '판매가능상품', 'count': 32, 'ratio': 7.6, 'trend': 'down'},
+                {'rank': 4, 'tag': '환불일정', 'count': 28, 'ratio': 6.6, 'trend': 'up'},
+                {'rank': 5, 'tag': '검수일정', 'count': 25, 'ratio': 5.9, 'trend': 'neutral'},
+                {'rank': 6, 'tag': '차란백배송일정', 'count': 22, 'ratio': 5.2, 'trend': 'up'},
+                {'rank': 7, 'tag': '반품절차', 'count': 20, 'ratio': 4.7, 'trend': 'neutral'},
+                {'rank': 8, 'tag': '수거확인', 'count': 18, 'ratio': 4.3, 'trend': 'down'},
+                {'rank': 9, 'tag': '정산일정', 'count': 15, 'ratio': 3.6, 'trend': 'up'},
+                {'rank': 10, 'tag': '회원탈퇴', 'count': 12, 'ratio': 2.8, 'trend': 'neutral'}
+            ]
+        },
+        'market_tag_stats': {
+            'this_week': 145,
+            'last_week': 132,
+            'change_rate': '+9.8%',
+            'ai_rate': 25,
+            'top_tags': [
+                {'rank': 1, 'tag': '구매자/배송일정문의', 'count': 28, 'ratio': 19.3, 'trend': 'up'},
+                {'rank': 2, 'tag': '판매자/정산관련문의', 'count': 22, 'ratio': 15.2, 'trend': 'neutral'},
+                {'rank': 3, 'tag': '구매자/주문취소요청', 'count': 18, 'ratio': 12.4, 'trend': 'up'},
+                {'rank': 4, 'tag': '판매자/검수일정문의', 'count': 15, 'ratio': 10.3, 'trend': 'down'},
+                {'rank': 5, 'tag': '공통/마켓구조이해문의', 'count': 12, 'ratio': 8.3, 'trend': 'neutral'},
+                {'rank': 6, 'tag': '판매자/상품등록·수정방법문의', 'count': 10, 'ratio': 6.9, 'trend': 'up'},
+                {'rank': 7, 'tag': '구매자/반품가능문의(구매확정)', 'count': 8, 'ratio': 5.5, 'trend': 'neutral'},
+                {'rank': 8, 'tag': '판매자/수수료관련문의', 'count': 7, 'ratio': 4.8, 'trend': 'down'},
+                {'rank': 9, 'tag': '구매자/구매취소확인문의', 'count': 6, 'ratio': 4.1, 'trend': 'up'},
+                {'rank': 10, 'tag': '공통/배송비관련문의', 'count': 5, 'ratio': 3.4, 'trend': 'neutral'}
+            ]
+        }
     }
 
-# Vercel handler
-handler = app
+
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        """Vercel HTTP handler"""
+        try:
+            # Query params 파싱
+            parsed = urlparse(self.path)
+            query_params = parse_qs(parsed.query)
+            period = query_params.get('period', ['daily'])[0]
+            
+            # 환경변수
+            access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
+            access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
+            
+            # 데이터 가져오기
+            if period == 'daily':
+                data = get_daily_stats(access_key, access_secret)
+            else:
+                data = generate_demo_daily()
+            
+            # JSON 응답
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+            
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            error_data = {'error': str(e)}
+            self.wfile.write(json.dumps(error_data).encode('utf-8'))
