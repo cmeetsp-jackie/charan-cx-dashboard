@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 1600px;
+            max-width: 2400px;
             margin: 0 auto;
         }
         
@@ -30,18 +30,6 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             margin-bottom: 25px;
-            animation: slideDown 0.5s ease-out;
-        }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         
         .header h1 {
@@ -58,40 +46,141 @@
             color: #7f8c8d;
             font-size: 15px;
         }
+
+        /* 3컬럼 레이아웃 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* 태그 분석 카드 (다크 테마) */
+        .tag-analysis {
+            background: #1a1f2e;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .tag-analysis-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .tag-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .tag-kpi-card {
+            background: #252b3b;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .tag-kpi-card.blue { border-left-color: #667eea; }
+        .tag-kpi-card.cyan { border-left-color: #00d4ff; }
+        .tag-kpi-card.purple { border-left-color: #764ba2; }
+        .tag-kpi-card.green { border-left-color: #00ff88; }
+
+        .tag-kpi-label {
+            color: #8b92a7;
+            font-size: 11px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .tag-kpi-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .tag-table-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .tag-table {
+            width: 100%;
+        }
+
+        .tag-row {
+            background: #252b3b;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 30px 1fr 50px 50px 30px;
+            gap: 10px;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .tag-rank {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tag-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .tag-count {
+            color: #00d4ff;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .tag-ratio {
+            color: #8b92a7;
+            text-align: right;
+        }
+
+        .tag-trend {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .tag-trend.up { color: #00ff88; }
+        .tag-trend.down { color: #ff4444; }
+        .tag-trend.stable { color: #8b92a7; }
         
+        /* 중앙 메인 대시보드 */
+        .main-dashboard {
+            min-width: 0;
+        }
+
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 25px;
         }
         
         .kpi-card {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.6s ease-out;
-            animation-fill-mode: backwards;
-        }
-        
-        .kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .kpi-card:hover::before {
-            opacity: 1;
         }
         
         .kpi-card:hover {
@@ -99,36 +188,16 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.25);
         }
         
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .kpi-card:nth-child(1) { animation-delay: 0.1s; }
-        .kpi-card:nth-child(2) { animation-delay: 0.2s; }
-        .kpi-card:nth-child(3) { animation-delay: 0.3s; }
-        .kpi-card:nth-child(4) { animation-delay: 0.4s; }
-        .kpi-card:nth-child(5) { animation-delay: 0.5s; }
-        .kpi-card:nth-child(6) { animation-delay: 0.6s; }
-        .kpi-card:nth-child(7) { animation-delay: 0.7s; }
-        
         .kpi-label {
-            font-size: 14px;
+            font-size: 12px;
             color: #95a5a6;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
         
         .kpi-value {
-            font-size: 42px;
+            font-size: 32px;
             font-weight: 800;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
@@ -136,66 +205,53 @@
             background-clip: text;
         }
         
-        .kpi-unit {
-            font-size: 18px;
-            color: #95a5a6;
-            margin-left: 4px;
-        }
-        
         .chart-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
             margin-bottom: 25px;
         }
         
         .chart-card {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            animation: fadeInUp 0.8s ease-out;
         }
         
         .chart-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #2c3e50;
         }
         
         canvas {
-            max-height: 350px;
+            max-height: 300px;
         }
         
         .member-list {
-            margin-top: 25px;
+            margin-top: 20px;
         }
         
         .member-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
+            padding: 12px;
             background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            transition: all 0.3s;
-        }
-        
-        .member-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
+            border-radius: 8px;
+            margin-bottom: 8px;
         }
         
         .member-name {
             font-weight: 600;
             color: #2c3e50;
-            font-size: 15px;
+            font-size: 14px;
         }
         
         .member-count {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: #667eea;
         }
@@ -221,9 +277,7 @@
             display: none;
         }
 
-        .loading.show {
-            display: block;
-        }
+        .loading.show { display: block; }
 
         .loading-spinner {
             border: 4px solid #f3f3f3;
@@ -239,6 +293,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* 반응형 */
+        @media (max-width: 1600px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .tag-analysis {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -248,46 +312,105 @@
             <div class="subtitle">채널톡 고객응대 현황 - Daily</div>
         </div>
 
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-label">문의건수</div>
-                <div class="kpi-value" id="totalChats">-</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">케어드 문의</div>
-                <div class="kpi-value" id="caredChats">-</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">마켓 문의</div>
-                <div class="kpi-value" id="marketChats">-</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">문의 응대중</div>
-                <div class="kpi-value" id="openChats">-</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">문의종료</div>
-                <div class="kpi-value" id="closedChats">-</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">평균 응답시간</div>
-                <div class="kpi-value" id="avgResponse">-</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">고객 만족도</div>
-                <div class="kpi-value" id="csat">-</div>
-            </div>
-        </div>
+        <div class="main-grid">
+            <!-- 왼쪽: 케어드 태그 분석 -->
+            <div class="tag-analysis">
+                <div class="tag-analysis-title">📦 케어드 태그 분석</div>
+                
+                <div class="tag-kpi-grid">
+                    <div class="tag-kpi-card blue">
+                        <div class="tag-kpi-label">오늘 총 문의</div>
+                        <div class="tag-kpi-value" id="caredThisWeek">-</div>
+                    </div>
+                    <div class="tag-kpi-card blue">
+                        <div class="tag-kpi-label">어제 총 문의</div>
+                        <div class="tag-kpi-value" id="caredLastWeek">-</div>
+                    </div>
+                    <div class="tag-kpi-card cyan">
+                        <div class="tag-kpi-label">증감율</div>
+                        <div class="tag-kpi-value" id="caredChange">-</div>
+                    </div>
+                    <div class="tag-kpi-card purple">
+                        <div class="tag-kpi-label">AI 처리율</div>
+                        <div class="tag-kpi-value" id="caredAI">0%</div>
+                    </div>
+                </div>
 
-        <div class="chart-section">
-            <div class="chart-card">
-                <div class="chart-title">시간대별 대화량</div>
-                <canvas id="hourlyChart"></canvas>
+                <div class="tag-table-title">상위 10개 태그 분석</div>
+                <div id="caredTagTable"></div>
             </div>
-            <div class="chart-card">
-                <div class="chart-title">팀원별 처리 현황</div>
-                <canvas id="memberChart"></canvas>
-                <div class="member-list" id="memberList"></div>
+
+            <!-- 중앙: 메인 대시보드 -->
+            <div class="main-dashboard">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">문의건수</div>
+                        <div class="kpi-value" id="totalChats">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">케어드 문의</div>
+                        <div class="kpi-value" id="caredChats">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">마켓 문의</div>
+                        <div class="kpi-value" id="marketChats">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">문의 응대중</div>
+                        <div class="kpi-value" id="openChats">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">문의종료</div>
+                        <div class="kpi-value" id="closedChats">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">평균 응답시간</div>
+                        <div class="kpi-value" id="avgResponse">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">고객 만족도</div>
+                        <div class="kpi-value" id="csat">-</div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-card">
+                        <div class="chart-title">시간대별 대화량</div>
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">팀원별 처리 현황</div>
+                        <canvas id="memberChart"></canvas>
+                        <div class="member-list" id="memberList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 마켓 태그 분석 -->
+            <div class="tag-analysis">
+                <div class="tag-analysis-title">🛍️ 마켓 태그 분석</div>
+                
+                <div class="tag-kpi-grid">
+                    <div class="tag-kpi-card blue">
+                        <div class="tag-kpi-label">오늘 총 문의</div>
+                        <div class="tag-kpi-value" id="marketThisWeek">-</div>
+                    </div>
+                    <div class="tag-kpi-card blue">
+                        <div class="tag-kpi-label">어제 총 문의</div>
+                        <div class="tag-kpi-value" id="marketLastWeek">-</div>
+                    </div>
+                    <div class="tag-kpi-card cyan">
+                        <div class="tag-kpi-label">증감율</div>
+                        <div class="tag-kpi-value" id="marketChange">-</div>
+                    </div>
+                    <div class="tag-kpi-card green">
+                        <div class="tag-kpi-label">AI 처리율</div>
+                        <div class="tag-kpi-value" id="marketAI">0%</div>
+                    </div>
+                </div>
+
+                <div class="tag-table-title">상위 10개 태그 분석</div>
+                <div id="marketTagTable"></div>
             </div>
         </div>
 
@@ -302,7 +425,6 @@
     <script>
         let hourlyChart, memberChart;
 
-        // 날짜 표시
         function updateDateDisplay() {
             const now = new Date();
             const year = now.getFullYear();
@@ -315,15 +437,12 @@
             document.getElementById('loading').classList.add('show');
             
             try {
-                const response = await fetch('/api/stats?period=daily', { timeout: 15000 });
-                
-                if (!response.ok) {
-                    throw new Error('API 응답 실패');
-                }
+                const response = await fetch('/api/stats?period=daily');
+                if (!response.ok) throw new Error('API 응답 실패');
                 
                 const data = await response.json();
 
-                // KPI 업데이트
+                // 메인 KPI
                 document.getElementById('totalChats').textContent = data.total_chats || 0;
                 document.getElementById('caredChats').textContent = data.cared_chats || 0;
                 document.getElementById('marketChats').textContent = data.market_chats || 0;
@@ -332,33 +451,69 @@
                 document.getElementById('avgResponse').textContent = data.avg_response_time || '-';
                 document.getElementById('csat').textContent = data.csat ? `${data.csat}/5.0` : '-';
 
-                // 시간대별 차트 업데이트
-                updateHourlyChart(data.hourly_data);
+                // 케어드 태그 분석
+                if (data.cared_tag_stats) {
+                    updateTagAnalysis('cared', data.cared_tag_stats);
+                }
 
-                // 팀원별 차트 업데이트
+                // 마켓 태그 분석
+                if (data.market_tag_stats) {
+                    updateTagAnalysis('market', data.market_tag_stats);
+                }
+
+                // 차트 업데이트
+                updateHourlyChart(data.hourly_data);
                 updateMemberChart(data.member_stats);
 
-                // 마지막 업데이트 시간
                 document.getElementById('lastUpdate').textContent = 
                     `마지막 업데이트: ${new Date().toLocaleString('ko-KR')}`;
 
             } catch (error) {
                 console.error('데이터 로드 실패:', error);
-                alert('데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
             } finally {
                 document.getElementById('loading').classList.remove('show');
             }
         }
 
-        function updateHourlyChart(data) {
-            const ctx = document.getElementById('hourlyChart');
+        function updateTagAnalysis(type, stats) {
+            const prefix = type === 'cared' ? 'cared' : 'market';
             
-            if (hourlyChart) {
-                hourlyChart.destroy();
+            document.getElementById(`${prefix}ThisWeek`).textContent = stats.this_week || 0;
+            document.getElementById(`${prefix}LastWeek`).textContent = stats.last_week || 0;
+            document.getElementById(`${prefix}Change`).textContent = stats.change_rate || '0%';
+            document.getElementById(`${prefix}AI`).textContent = stats.ai_rate + '%';
+
+            const tableId = `${prefix}TagTable`;
+            const table = document.getElementById(tableId);
+            
+            if (!stats.top_tags || stats.top_tags.length === 0) {
+                table.innerHTML = '<div style="color: #8b92a7; text-align: center; padding: 20px;">데이터 없음</div>';
+                return;
             }
 
+            const rows = stats.top_tags.map(tag => {
+                const trendIcon = tag.trend === 'up' ? '↑' : tag.trend === 'down' ? '↓' : '→';
+                const trendClass = tag.trend;
+                
+                return `
+                    <div class="tag-row">
+                        <div class="tag-rank">${tag.rank}</div>
+                        <div class="tag-name">${tag.tag}</div>
+                        <div class="tag-count">${tag.count}</div>
+                        <div class="tag-ratio">${tag.ratio}%</div>
+                        <div class="tag-trend ${trendClass}">${trendIcon}</div>
+                    </div>
+                `;
+            }).join('');
+
+            table.innerHTML = rows;
+        }
+
+        function updateHourlyChart(data) {
+            const ctx = document.getElementById('hourlyChart');
+            if (hourlyChart) hourlyChart.destroy();
+
             const labels = Array.from({length: 24}, (_, i) => `${i}시`);
-            
             const values = Array.from({length: 24}, (_, i) => {
                 const found = data.find(d => d.hour === i);
                 return found ? found.count : 0;
@@ -380,14 +535,9 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
-                        }
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
                     }
                 }
             });
@@ -395,10 +545,7 @@
 
         function updateMemberChart(members) {
             const ctx = document.getElementById('memberChart');
-            
-            if (memberChart) {
-                memberChart.destroy();
-            }
+            if (memberChart) memberChart.destroy();
 
             const names = members.map(m => m.name);
             const counts = members.map(m => m.count);
@@ -426,16 +573,12 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                font: { size: 13, weight: '600' }
-                            }
+                            labels: { padding: 15, font: { size: 12, weight: '600' } }
                         }
                     }
                 }
             });
 
-            // 팀원 리스트 업데이트
             const listHtml = members.map(m => `
                 <div class="member-item">
                     <span class="member-name">${m.name}</span>
@@ -445,11 +588,8 @@
             document.getElementById('memberList').innerHTML = listHtml;
         }
 
-        // 초기화
         updateDateDisplay();
         updateDashboard();
-        
-        // 5분마다 자동 새로고침
         setInterval(updateDashboard, 300000);
     </script>
 </body>
