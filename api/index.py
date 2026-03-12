@@ -339,3 +339,6 @@ def generate_demo_daily():
             ]
         }
     }
+
+# Vercel entry point
+application = app
