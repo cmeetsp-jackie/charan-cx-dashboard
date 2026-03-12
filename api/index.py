@@ -448,3 +448,6 @@ def generate_demo_weekly():
             {'name': 'Joy', 'count': 77}
         ]
     }
+
+# Vercel handler
+handler = app
