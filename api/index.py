@@ -57,9 +57,8 @@ MARKET_TAGS = [
 ]
 
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def stats(path):
+@app.route('/')
+def stats():
     """채널톡 통계 API"""
     period = request.args.get('period', 'daily')  # daily or weekly
     start_date = request.args.get('startDate', '')  # YYYY-MM-DD
