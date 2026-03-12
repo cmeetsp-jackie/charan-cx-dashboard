@@ -477,7 +477,7 @@
             document.getElementById('loading').classList.add('show');
             
             try {
-                const response = await fetch('/api/?period=daily');
+                const response = await fetch('/api/app?period=daily');
                 if (!response.ok) throw new Error('API 응답 실패');
                 
                 const data = await response.json();

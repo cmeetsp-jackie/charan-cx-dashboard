@@ -57,10 +57,7 @@ MARKET_TAGS = [
 ]
 
 
-@app.route('/api/index')
-@app.route('/api/index/')
-@app.route('/api')
-@app.route('/api/')
+@app.route('/')
 def stats():
     """채널톡 통계 API"""
     period = request.args.get('period', 'daily')
