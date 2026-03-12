@@ -90,9 +90,25 @@ def get_daily_stats(access_key, access_secret):
             if today_start <= datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) <= today_end
         ]
         
+        # 어제 데이터
+        yesterday_start = (now_kst - timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0)
+        yesterday_end = (now_kst - timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        yesterday_chats = [
+            chat for chat in chats
+            if yesterday_start <= datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) <= yesterday_end
+        ]
+        
         # 케어드/마켓 분류
         cared_chats = [c for c in today_chats if classify_chat(c) == 'cared']
         market_chats = [c for c in today_chats if classify_chat(c) == 'market']
+        
+        yesterday_cared = [c for c in yesterday_chats if classify_chat(c) == 'cared']
+        yesterday_market = [c for c in yesterday_chats if classify_chat(c) == 'market']
+        
+        # 태그별 통계
+        cared_tag_stats = calculate_tag_stats(cared_chats, yesterday_cared, CARED_TAGS)
+        market_tag_stats = calculate_tag_stats(market_chats, yesterday_market, MARKET_TAGS)
         
         # 시간별 데이터
         hourly_data = []
@@ -116,7 +132,9 @@ def get_daily_stats(access_key, access_secret):
             'avg_response_time': avg_response,
             'csat': '4.5',
             'hourly_data': hourly_data,
-            'member_stats': member_stats
+            'member_stats': member_stats,
+            'cared_tag_stats': cared_tag_stats,
+            'market_tag_stats': market_tag_stats
         }
         
     except Exception as e:
@@ -303,6 +321,79 @@ def calculate_avg_response(chats):
     seconds = avg_seconds % 60
     
     return f'{minutes}분 {seconds}초'
+
+
+def calculate_tag_stats(today_chats, yesterday_chats, tag_list):
+    """태그별 통계 계산"""
+    # 오늘 태그 카운트
+    tag_counts_today = defaultdict(int)
+    for chat in today_chats:
+        tags = chat.get('tags', [])
+        for tag in tags:
+            if tag in tag_list:
+                tag_counts_today[tag] += 1
+    
+    # 어제 태그 카운트
+    tag_counts_yesterday = defaultdict(int)
+    for chat in yesterday_chats:
+        tags = chat.get('tags', [])
+        for tag in tags:
+            if tag in tag_list:
+                tag_counts_yesterday[tag] += 1
+    
+    # 상위 10개 추출
+    top_tags = sorted(tag_counts_today.items(), key=lambda x: x[1], reverse=True)[:10]
+    
+    total_today = len(today_chats)
+    total_yesterday = len(yesterday_chats)
+    
+    result = {
+        'this_week': total_today,
+        'last_week': total_yesterday,
+        'change_rate': calculate_change_rate(total_today, total_yesterday),
+        'ai_rate': 0,  # AI 처리율은 추후 구현
+        'top_tags': []
+    }
+    
+    for idx, (tag, count) in enumerate(top_tags, 1):
+        yesterday_count = tag_counts_yesterday.get(tag, 0)
+        ratio = round((count / total_today * 100), 1) if total_today > 0 else 0
+        trend = calculate_trend(count, yesterday_count)
+        
+        result['top_tags'].append({
+            'rank': idx,
+            'tag': tag,
+            'count': count,
+            'ratio': ratio,
+            'trend': trend
+        })
+    
+    return result
+
+
+def calculate_change_rate(today, yesterday):
+    """증감율 계산"""
+    if yesterday == 0:
+        return '+100%' if today > 0 else '0%'
+    
+    change = ((today - yesterday) / yesterday) * 100
+    sign = '+' if change > 0 else ''
+    return f'{sign}{int(change)}%'
+
+
+def calculate_trend(today_count, yesterday_count):
+    """트렌드 계산"""
+    if yesterday_count == 0:
+        return 'up' if today_count > 0 else 'stable'
+    
+    change = ((today_count - yesterday_count) / yesterday_count) * 100
+    
+    if change > 10:
+        return 'up'
+    elif change < -10:
+        return 'down'
+    else:
+        return 'stable'
 
 
 def generate_demo_daily():
