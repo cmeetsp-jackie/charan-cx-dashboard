@@ -1,5 +1,4 @@
-from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
+from flask import Flask, jsonify, request
 import os
 import urllib.request
 import json
@@ -8,6 +7,8 @@ from collections import defaultdict
 
 # 한국 시간대 (KST = UTC+9)
 KST = timezone(timedelta(hours=9))
+
+app = Flask(__name__)
 
 # 태그 데이터
 CARED_TAGS = [
@@ -56,12 +57,30 @@ MARKET_TAGS = [
 ]
 
 
+@app.route('/api/index')
+@app.route('/api/index/')
+@app.route('/api')
+@app.route('/api/')
+def stats():
+    """채널톡 통계 API"""
+    period = request.args.get('period', 'daily')
+    
+    access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
+    access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
+    
+    if period == 'daily':
+        data = get_daily_stats(access_key, access_secret)
+    else:
+        data = generate_demo_daily()
+    
+    return jsonify(data)
+
+
 def get_daily_stats(access_key, access_secret):
     """일일 통계"""
     try:
         chats = fetch_channeltalk_data(access_key, access_secret)
         
-        # 오늘 데이터만 필터
         now_kst = datetime.now(KST)
         today_start = now_kst.replace(hour=0, minute=1, second=0, microsecond=0)
         today_end = now_kst.replace(hour=23, minute=59, second=59, microsecond=999999)
@@ -71,7 +90,6 @@ def get_daily_stats(access_key, access_secret):
             if today_start <= datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) <= today_end
         ]
         
-        # 어제 데이터
         yesterday_start = (now_kst - timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0)
         yesterday_end = (now_kst - timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
         
@@ -80,31 +98,24 @@ def get_daily_stats(access_key, access_secret):
             if yesterday_start <= datetime.fromtimestamp(chat['createdAt'] / 1000, tz=KST) <= yesterday_end
         ]
         
-        # 케어드/마켓 분류
         cared_chats = [c for c in today_chats if classify_chat(c) == 'cared']
         market_chats = [c for c in today_chats if classify_chat(c) == 'market']
         
         yesterday_cared = [c for c in yesterday_chats if classify_chat(c) == 'cared']
         yesterday_market = [c for c in yesterday_chats if classify_chat(c) == 'market']
         
-        # 태그별 통계
         cared_tag_stats = calculate_tag_stats(cared_chats, yesterday_cared, CARED_TAGS)
         market_tag_stats = calculate_tag_stats(market_chats, yesterday_market, MARKET_TAGS)
         
-        # 시간별 데이터
         hourly_data = []
         for hour in range(24):
             count = sum(1 for c in today_chats 
                        if datetime.fromtimestamp(c['createdAt'] / 1000, tz=KST).hour == hour)
             hourly_data.append({'hour': hour, 'count': count})
         
-        # 팀원별
         member_stats = calculate_member_stats(today_chats, chats)
-        
-        # 응답시간
         avg_response = calculate_avg_response(today_chats)
         
-        # AI 응답 통계
         ai_responses = sum(1 for c in today_chats if c.get('state') == 'closed' and not c.get('assigneeId'))
         ai_rate = round((ai_responses / len(today_chats) * 100), 1) if len(today_chats) > 0 else 0
         
@@ -133,7 +144,6 @@ def fetch_channeltalk_data(access_key, access_secret):
     """채널톡 API에서 데이터 가져오기"""
     all_chats = []
     
-    # opened 상태 (2000개)
     for state in ['opened', 'closed']:
         limit = 2000 if state == 'opened' else 10000
         for offset in range(0, limit, 1000):
@@ -149,7 +159,6 @@ def fetch_channeltalk_data(access_key, access_secret):
                     break
                 all_chats.extend(chats)
     
-    # ID 기반 중복 제거
     seen = set()
     unique_chats = []
     for chat in all_chats:
@@ -191,7 +200,6 @@ def calculate_tag_stats(today_chats, yesterday_chats, tag_list):
             if tag_name in tag_list:
                 yesterday_tag_counts[tag_name] += 1
     
-    # 상위 10개 태그
     top_tags = sorted(today_tag_counts.items(), key=lambda x: x[1], reverse=True)[:10]
     
     top_tags_data = []
@@ -208,12 +216,10 @@ def calculate_tag_stats(today_chats, yesterday_chats, tag_list):
             'trend': trend
         })
     
-    # 변화율
     this_week = len(today_chats)
     last_week = len(yesterday_chats)
     change_rate = calculate_change_rate(this_week, last_week)
     
-    # AI 처리율 (임시)
     ai_rate = 0
     
     return {
@@ -336,37 +342,3 @@ def generate_demo_daily():
             ]
         }
     }
-
-
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        """Vercel HTTP handler"""
-        try:
-            # Query params 파싱
-            parsed = urlparse(self.path)
-            query_params = parse_qs(parsed.query)
-            period = query_params.get('period', ['daily'])[0]
-            
-            # 환경변수
-            access_key = os.getenv('CHANNELTALK_ACCESS_KEY', '').strip()
-            access_secret = os.getenv('CHANNELTALK_ACCESS_SECRET', '').strip()
-            
-            # 데이터 가져오기
-            if period == 'daily':
-                data = get_daily_stats(access_key, access_secret)
-            else:
-                data = generate_demo_daily()
-            
-            # JSON 응답
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
-            
-        except Exception as e:
-            self.send_response(500)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            error_data = {'error': str(e)}
-            self.wfile.write(json.dumps(error_data).encode('utf-8'))
