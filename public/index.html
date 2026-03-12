@@ -689,9 +689,12 @@
             document.getElementById('memberList').innerHTML = listHtml;
         }
 
-        updateDateDisplay();
-        updateDashboard();
-        setInterval(updateDashboard, 300000);
+        // 페이지 로드 후 실행
+        window.addEventListener('load', function() {
+            updateDateDisplay();
+            updateDashboard();
+            setInterval(updateDashboard, 300000);
+        });
     </script>
 </body>
 </html>
